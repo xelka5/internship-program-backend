@@ -1,2 +1,29 @@
 # Spring Framework properties
 spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+# Security properties
+security:
+  oauth2:
+    resource:
+      filter-order: 3
+
+# Oauth20 properties
+oauthData:
+  clientId: internship
+  clientSecret: $3cr3Tf0rD3Vpurp0$e$
+  accessTokenValidity: 3600 # 1 hour
+  refreshTokenValidity: 604800 # 7 days
+  jwtSigningKey: jWtS3cR3tH1gHS3cur3d
+  authorizedGrantTypes: password,refresh_token
+
+lombok:
+  log:
+    fieldName: logger
