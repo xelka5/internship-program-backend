@@ -24,9 +24,9 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
       .antMatchers("/api/**")
       .and()
       .authorizeRequests()
-      .antMatchers("/api/users/registration")
+      .antMatchers("/api/users/registration", "/api/users/email-check")
       .permitAll()
-      .antMatchers("/api/users")
+      .antMatchers("/api/admin")
       .hasAuthority("ADMIN")
       .anyRequest()
       .authenticated();

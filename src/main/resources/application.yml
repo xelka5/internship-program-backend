@@ -23,7 +23,3 @@ oauthData:
   refreshTokenValidity: 604800 # 7 days
   jwtSigningKey: jWtS3cR3tH1gHS3cur3d
   authorizedGrantTypes: password,refresh_token
-
-lombok:
-  log:
-    fieldName: logger

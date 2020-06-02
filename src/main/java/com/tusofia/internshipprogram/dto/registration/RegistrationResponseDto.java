@@ -1,4 +1,4 @@
-package com.tusofia.internshipprogram.dto;
+package com.tusofia.internshipprogram.dto.registration;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

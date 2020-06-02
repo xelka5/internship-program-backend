@@ -1,11 +1,9 @@
 package com.tusofia.internshipprogram.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tusofia.internshipprogram.entity.enumeration.Role;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -14,15 +12,11 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @NoArgsConstructor
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
-public class UserEntity {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+@AllArgsConstructor
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "email")}, name = "user")
+public class UserEntity extends BaseEntity{
 
   @NotEmpty
   private String username;
@@ -40,11 +34,9 @@ public class UserEntity {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  public UserEntity(@NotEmpty String username, @NotEmpty String password,
-                    @NotEmpty @Email String email, @NotNull Role role) {
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.role = role;
-  }
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private InternDetails internDetails;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private EmployerDetails employerDetails;
 }
