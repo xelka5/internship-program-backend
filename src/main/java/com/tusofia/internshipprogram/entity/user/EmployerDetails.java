@@ -1,7 +1,8 @@
-package com.tusofia.internshipprogram.entity;
+package com.tusofia.internshipprogram.entity.user;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tusofia.internshipprogram.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,6 +35,6 @@ public class EmployerDetails extends BaseEntity {
   @OneToOne
   @JoinColumn(name = "user_id")
   @JsonIgnore
-  private UserEntity user;
+  private User user;
 
 }

@@ -1,14 +1,18 @@
-package com.tusofia.internshipprogram.entity;
+package com.tusofia.internshipprogram.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.tusofia.internshipprogram.entity.enumeration.Role;
+import com.tusofia.internshipprogram.entity.BaseEntity;
+import com.tusofia.internshipprogram.entity.internship.Internship;
+import com.tusofia.internshipprogram.enumeration.UserRole;
+import com.tusofia.internshipprogram.enumeration.UserStatus;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,14 +20,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "email")}, name = "user")
-public class UserEntity extends BaseEntity{
+public class User extends BaseEntity {
 
   @NotEmpty
   private String username;
 
   @JsonIgnore
   @ToString.Exclude
-  @NotEmpty
   private String password;
 
   @NotEmpty
@@ -32,11 +35,20 @@ public class UserEntity extends BaseEntity{
 
   @NotNull
   @Enumerated(EnumType.STRING)
-  private Role role;
+  private UserRole role;
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  private UserStatus status;
+
+  private String profileImageName;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private InternDetails internDetails;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private EmployerDetails employerDetails;
+
+  @OneToMany(mappedBy="user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<Internship> internships;
 }

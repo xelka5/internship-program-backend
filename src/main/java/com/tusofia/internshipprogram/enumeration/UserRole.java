@@ -1,8 +1,8 @@
-package com.tusofia.internshipprogram.entity.enumeration;
+package com.tusofia.internshipprogram.enumeration;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public enum Role implements GrantedAuthority {
+public enum UserRole implements GrantedAuthority {
   INTERN, EMPLOYER, ADMIN;
 
   @Override

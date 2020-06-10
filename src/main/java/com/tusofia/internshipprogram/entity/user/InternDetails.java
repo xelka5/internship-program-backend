@@ -1,19 +1,21 @@
-package com.tusofia.internshipprogram.dto.registration;
+package com.tusofia.internshipprogram.entity.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tusofia.internshipprogram.entity.BaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class InternUserDetailsDto {
+@Getter
+@Setter
+@Entity
+public class InternDetails extends BaseEntity {
 
   @NotEmpty
   private String firstName;
@@ -36,6 +38,13 @@ public class InternUserDetailsDto {
   @NotEmpty
   private String previousEducation;
 
-  @NotEmpty
+  @ElementCollection
+  @CollectionTable(name="skills", joinColumns=@JoinColumn(name="intern_id"))
+  @Column(name="skill")
   private List<String> skills;
+
+  @OneToOne
+  @JoinColumn(name = "user_id")
+  @JsonIgnore
+  private User user;
 }

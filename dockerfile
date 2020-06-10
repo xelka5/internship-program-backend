@@ -1,5 +1,3 @@
-LABEL maintainer="Internship Program"
-
 FROM maven:3.6.3-jdk-11 as build
 COPY src /usr/src/app/src  
 COPY pom.xml /usr/src/app  

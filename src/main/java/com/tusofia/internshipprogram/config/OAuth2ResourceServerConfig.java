@@ -1,5 +1,6 @@
 package com.tusofia.internshipprogram.config;
 
+import com.tusofia.internshipprogram.enumeration.UserRole;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,10 +25,12 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
       .antMatchers("/api/**")
       .and()
       .authorizeRequests()
-      .antMatchers("/api/users/registration", "/api/users/email-check")
+      .antMatchers("/api/users/registration/**")
       .permitAll()
-      .antMatchers("/api/admin")
-      .hasAuthority("ADMIN")
+      .antMatchers("/api/**/admin/**")
+      .hasAuthority(UserRole.ADMIN.getAuthority())
+      .antMatchers("/api/**/employer/**")
+      .hasAuthority(UserRole.EMPLOYER.getAuthority())
       .anyRequest()
       .authenticated();
   }

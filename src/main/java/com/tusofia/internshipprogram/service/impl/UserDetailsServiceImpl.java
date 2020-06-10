@@ -1,7 +1,7 @@
 package com.tusofia.internshipprogram.service.impl;
 
-import com.tusofia.internshipprogram.entity.UserEntity;
-import com.tusofia.internshipprogram.exception.UserNotFoundException;
+import com.tusofia.internshipprogram.entity.user.User;
+import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.repository.UserRepository;
 import com.tusofia.internshipprogram.service.domain.CustomUserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +24,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found: " + username));
+    User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
-    return new CustomUserPrincipal(user.getUsername(), user.getPassword(),
+    return new CustomUserPrincipal(user.getEmail(), user.getPassword(),
             Collections.singletonList(user.getRole()), user.getEmail());
   }
 }

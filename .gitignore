@@ -1,5 +1,6 @@
 HELP.md
 target/
+profile-images/
 !**/src/main/**
 !**/src/test/**
 mvnw

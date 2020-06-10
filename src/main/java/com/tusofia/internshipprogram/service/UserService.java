@@ -2,14 +2,20 @@ package com.tusofia.internshipprogram.service;
 
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckRequestDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckResponseDto;
-import com.tusofia.internshipprogram.dto.registration.RegistrationResponseDto;
-import com.tusofia.internshipprogram.dto.registration.UserDetailsDto;
+import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
+import com.tusofia.internshipprogram.dto.user.UploadImageResponseDto;
+import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-  RegistrationResponseDto registerNewUser(UserDetailsDto newUserDetails);
+  UserDetailsResponseDto registerNewUser(UserDetailsDto newUserDetails);
+
+  UserDetailsResponseDto updateUserDetails(UserDetailsDto updatedUserDetails);
 
   EmailCheckResponseDto checkEmail(EmailCheckRequestDto emailCheckRequest);
 
-  UserDetailsDto getUserDetails(Long userId);
+  UserDetailsDto getUserDetails(String userEmail);
+
+  UploadImageResponseDto uploadProfileImage(MultipartFile profileImage, String userEmail);
 }
