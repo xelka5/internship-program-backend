@@ -36,7 +36,7 @@ public class InternshipServiceImpl implements InternshipService {
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
     Internship newInternship = internshipMapper.internshipDtoToInternship(internshipDto);
-    newInternship.setUser(savedUser);
+    newInternship.setEmployer(savedUser.getEmployerDetails());
 
     internshipRepository.save(newInternship);
 
@@ -48,7 +48,7 @@ public class InternshipServiceImpl implements InternshipService {
     User savedUser = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    return internshipMapper.internshipListToInternshipDtoList(savedUser.getInternships());
+    return internshipMapper.internshipListToInternshipDtoList(savedUser.getEmployerDetails().getInternships());
 
   }
 
@@ -57,7 +57,7 @@ public class InternshipServiceImpl implements InternshipService {
     User savedUser = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    List<Internship> internshipList = savedUser.getInternships();
+    List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
     Internship savedInternship = internshipList.stream()
             .filter(internship -> internship.getTrackingNumber().equals(internshipDto.getTrackingNumber()))
@@ -75,7 +75,7 @@ public class InternshipServiceImpl implements InternshipService {
     User savedUser = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    List<Internship> internshipList = savedUser.getInternships();
+    List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
     Internship savedInternship = internshipList.stream()
             .filter(internship -> internship.getTrackingNumber().equals(trackingNumber))

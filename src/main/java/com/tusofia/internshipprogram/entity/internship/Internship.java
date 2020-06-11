@@ -1,6 +1,9 @@
 package com.tusofia.internshipprogram.entity.internship;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tusofia.internshipprogram.entity.BaseEntity;
+import com.tusofia.internshipprogram.entity.application.InternshipApplication;
+import com.tusofia.internshipprogram.entity.user.EmployerDetails;
 import com.tusofia.internshipprogram.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +14,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,6 +44,12 @@ public class Internship extends BaseEntity {
   private Integer maxNumberOfStudents;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "employer_id")
+  @JsonIgnore
+  private EmployerDetails employer;
+
+  @OneToMany(mappedBy = "internship",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<InternshipApplication> applications;
+
+
 }

@@ -2,6 +2,7 @@ package com.tusofia.internshipprogram.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tusofia.internshipprogram.entity.BaseEntity;
+import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,4 +48,8 @@ public class InternDetails extends BaseEntity {
   @JoinColumn(name = "user_id")
   @JsonIgnore
   private User user;
+
+  @OneToMany(mappedBy = "internDetails", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<InternshipApplication> internshipApplications;
+
 }
