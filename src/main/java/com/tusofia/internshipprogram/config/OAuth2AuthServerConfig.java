@@ -58,6 +58,9 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
   @Value("${oauthData.refreshTokenValidity}")
   private int refreshTokenValiditySeconds;
 
+  @Value("${cors.allowedOrigin}")
+  private String allowedOrigin;
+
   @Autowired
   public OAuth2AuthServerConfig(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
     this.authenticationManager = authenticationManager;
@@ -130,7 +133,7 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.addAllowedOrigin("http://localhost:4200");
+    config.addAllowedOrigin(allowedOrigin);
     config.addAllowedHeader("*");
     config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     source.registerCorsConfiguration("/**", config);

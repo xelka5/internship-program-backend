@@ -2,6 +2,7 @@ package com.tusofia.internshipprogram.controller;
 
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipDto;
+import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
 import com.tusofia.internshipprogram.service.InternshipService;
 import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.util.List;
-import java.util.Set;
 
 import static com.tusofia.internshipprogram.config.OAuth2AuthServerConfig.USER_EMAIL_LABEL;
 
@@ -27,7 +26,7 @@ public class InternshipController {
   }
 
   @GetMapping
-  public List<InternshipDto> getAllInternships() {
+  public List<InternshipExtendedDto> getAllInternships() {
     return internshipService.getAllInternships();
   }
 
@@ -45,6 +44,13 @@ public class InternshipController {
     return internshipService.getInternshipByTrackingNumber(trackingNumber, userEmail);
   }
 
+  @GetMapping("/active")
+  public List<InternshipExtendedDto> getActiveInternInternships(Authentication authentication) {
+    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
+
+    return internshipService.getActiveInternInternships(userEmail);
+  }
+
   @PostMapping
   public BaseResponseDto addNewInternship(@Valid @RequestBody InternshipDto internshipDto, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
@@ -57,6 +63,13 @@ public class InternshipController {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
     return internshipService.editInternship(internshipDto, userEmail);
+  }
+
+  @DeleteMapping("employer/{trackingNumber}")
+  public BaseResponseDto deleteInternship(@PathVariable("trackingNumber") String trackingNumber, Authentication authentication) {
+    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
+
+    return internshipService.deleteInternship(trackingNumber, userEmail);
   }
 
 }

@@ -2,12 +2,17 @@ package com.tusofia.internshipprogram.service.impl;
 
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.application.ApplicationDetailsDto;
+import com.tusofia.internshipprogram.dto.application.ApplicationResponseDto;
 import com.tusofia.internshipprogram.dto.application.InternshipApplicationDto;
+import com.tusofia.internshipprogram.dto.application.PendingApplicationDto;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.internship.Internship;
+import com.tusofia.internshipprogram.entity.user.EmployerDetails;
 import com.tusofia.internshipprogram.entity.user.User;
+import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.exception.AlreadyAppliedException;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
+import com.tusofia.internshipprogram.exception.InsufficientRightsException;
 import com.tusofia.internshipprogram.mapper.ApplicationMapper;
 import com.tusofia.internshipprogram.repository.ApplicationRepository;
 import com.tusofia.internshipprogram.repository.InternshipRepository;
@@ -15,7 +20,9 @@ import com.tusofia.internshipprogram.repository.UserRepository;
 import com.tusofia.internshipprogram.service.ApplicationService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -70,6 +77,46 @@ public class ApplicationServiceImpl implements ApplicationService {
     newApplication.setInternDetails(savedUser.getInternDetails());
 
     applicationRepository.save(newApplication);
+
+    return new BaseResponseDto(true);
+  }
+
+  @Override
+  public List<PendingApplicationDto> getAllPendingApplications(String userEmail) {
+    User savedUser = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+    EmployerDetails employerDetails = savedUser.getEmployerDetails();
+
+    List<InternshipApplication> employersPendingApplications = new ArrayList<>();
+
+    for(Internship internship: employerDetails.getInternships()) {
+      employersPendingApplications.addAll(internship.getApplications()
+              .stream()
+              .filter(app -> app.getStatus() == ApplicationStatus.PENDING)
+              .collect(Collectors.toList())
+      );
+    }
+
+    return applicationMapper.internshipApplicationListToPendingApplicationDtoList(employersPendingApplications);
+  }
+
+  @Override
+  public BaseResponseDto updateApplicationResponse(ApplicationResponseDto applicationResponseDto, String userEmail) {
+    User savedUser = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+    InternshipApplication internshipApplication = savedUser.getEmployerDetails().getInternships()
+            .stream()
+            .flatMap(internship -> internship.getApplications().stream())
+            .filter(internship -> internship.getTrackingNumber().equals(applicationResponseDto.getTrackingNumber()))
+            .findAny()
+            .orElseThrow(() -> new InsufficientRightsException("Employer not privileged to change application status"));
+
+    internshipApplication.setResponseNotes(applicationResponseDto.getResponseNotes());
+    internshipApplication.setStatus(applicationResponseDto.getStatus());
+
+    applicationRepository.save(internshipApplication);
 
     return new BaseResponseDto(true);
   }

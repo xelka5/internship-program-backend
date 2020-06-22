@@ -10,6 +10,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   resources:
     add-mappings: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 # Security properties
 security:

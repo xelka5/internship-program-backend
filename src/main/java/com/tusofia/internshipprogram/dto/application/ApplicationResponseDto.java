@@ -1,6 +1,7 @@
 package com.tusofia.internshipprogram.dto.application;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApplicationEmployerDetailsDto {
+public class ApplicationResponseDto {
 
-  private String companyName;
+  private String responseNotes;
 
-  private String profileImageName;
+  private String trackingNumber;
+
+  private ApplicationStatus status;
+
 }

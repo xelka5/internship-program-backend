@@ -3,8 +3,8 @@ package com.tusofia.internshipprogram.entity.internship;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tusofia.internshipprogram.entity.BaseEntity;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
+import com.tusofia.internshipprogram.entity.report.InternReport;
 import com.tusofia.internshipprogram.entity.user.EmployerDetails;
-import com.tusofia.internshipprogram.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "trackingNumber")}, name = "internship")
 public class Internship extends BaseEntity {
 
   @NotEmpty
@@ -50,6 +50,9 @@ public class Internship extends BaseEntity {
 
   @OneToMany(mappedBy = "internship",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<InternshipApplication> applications;
+
+  @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<InternReport> internReports;
 
 
 }

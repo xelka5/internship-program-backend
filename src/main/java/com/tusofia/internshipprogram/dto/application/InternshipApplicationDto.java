@@ -22,6 +22,8 @@ public class InternshipApplicationDto {
   @NotNull
   private ApplicationStatus status;
 
+  private String trackingNumber;
+
   @NotNull
   private InternshipDto internship;
 

@@ -2,12 +2,11 @@ package com.tusofia.internshipprogram.controller;
 
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckRequestDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckResponseDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
 import com.tusofia.internshipprogram.dto.user.UploadImageResponseDto;
 import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
+import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
 import com.tusofia.internshipprogram.service.UserService;
 import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +32,11 @@ public class UserController {
   @GetMapping
   public UserDetailsDto getUserDetails(Authentication authentication) {
     return userService.getUserDetails(AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL));
+  }
+
+  @GetMapping("/email")
+  public UserDetailsDto getUserDetailsByEmail(@RequestParam("userEmail") String userEmail) {
+    return userService.getUserDetails(userEmail);
   }
 
   @PostMapping("/registration")

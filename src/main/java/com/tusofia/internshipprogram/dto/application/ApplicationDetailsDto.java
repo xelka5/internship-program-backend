@@ -16,5 +16,7 @@ public class ApplicationDetailsDto {
 
   private ApplicationStatus status;
 
+  private String responseNotes;
+
   private ApplicationInternshipDetailsDto internshipDetails;
 }
