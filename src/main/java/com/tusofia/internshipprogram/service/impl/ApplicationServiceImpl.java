@@ -67,7 +67,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             .anyMatch(application -> application.getInternDetails().getUser().getEmail().equals(userEmail));
 
     if(alreadyApplied) {
-      throw new AlreadyAppliedException("User has already applied for this internship");
+      throw new AlreadyAppliedException("You already applied for this internship");
     }
 
     InternshipApplication newApplication =

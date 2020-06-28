@@ -2,6 +2,7 @@ package com.tusofia.internshipprogram.mapper;
 
 import com.tusofia.internshipprogram.dto.application.ApplicationDetailsDto;
 import com.tusofia.internshipprogram.dto.application.PendingApplicationDto;
+import com.tusofia.internshipprogram.dto.internship.AssignedInternDto;
 import com.tusofia.internshipprogram.dto.user.EmployerProfileDto;
 import com.tusofia.internshipprogram.dto.application.ApplicationInternshipDetailsDto;
 import com.tusofia.internshipprogram.dto.application.InternshipApplicationDto;
@@ -46,4 +47,13 @@ public interface ApplicationMapper {
   @Mapping(target = "firstName", source = "internDetails.firstName")
   @Mapping(target = "lastName", source = "internDetails.lastName")
   InternProfileDto userToInternProfileDto(User user);
+
+  List<AssignedInternDto> internshipApplicationListToAssignedInternDtoList(List<InternshipApplication> internshipApplicationList);
+
+  @Mapping(target = "firstName", source = "internDetails.firstName")
+  @Mapping(target = "lastName", source = "internDetails.lastName")
+  @Mapping(target = "university", source = "internDetails.university")
+  @Mapping(target = "profileImageName", source = "internDetails.user.profileImageName")
+  @Mapping(target = "email", source = "internDetails.user.email")
+  AssignedInternDto internshipApplicationToAssignedInternDto(InternshipApplication internshipApplication);
 }

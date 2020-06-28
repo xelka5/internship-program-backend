@@ -2,10 +2,14 @@ package com.tusofia.internshipprogram.dto.internship;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.tusofia.internshipprogram.dto.user.EmployerProfileDto;
+import com.tusofia.internshipprogram.enumeration.Currency;
+import com.tusofia.internshipprogram.enumeration.DurationUnit;
+import com.tusofia.internshipprogram.enumeration.InternshipType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -22,9 +26,15 @@ public class InternshipExtendedDto {
 
   private Date startDate;
 
-  private String salary;
+  private Long duration;
 
-  private Integer maxNumberOfStudents;
+  private DurationUnit durationUnit;
+
+  private InternshipType type;
+
+  private Long salary;
+
+  private Currency currency;
 
   private EmployerProfileDto employer;
 }

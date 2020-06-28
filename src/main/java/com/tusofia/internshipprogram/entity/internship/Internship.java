@@ -5,6 +5,10 @@ import com.tusofia.internshipprogram.entity.BaseEntity;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.report.InternReport;
 import com.tusofia.internshipprogram.entity.user.EmployerDetails;
+import com.tusofia.internshipprogram.enumeration.Currency;
+import com.tusofia.internshipprogram.enumeration.DurationUnit;
+import com.tusofia.internshipprogram.enumeration.InternshipStatus;
+import com.tusofia.internshipprogram.enumeration.InternshipType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,11 +38,28 @@ public class Internship extends BaseEntity {
   @Column(columnDefinition = "TEXT")
   private String description;
 
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private InternshipStatus status;
+
   @NotNull
   private Date startDate;
 
-  @NotEmpty
-  private String salary;
+  @NotNull
+  private Long duration;
+
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private DurationUnit durationUnit;
+
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private InternshipType type;
+
+  private Long salary;
+
+  @Enumerated(EnumType.STRING)
+  private Currency currency;
 
   @NotNull
   private Integer maxNumberOfStudents;
@@ -53,6 +74,5 @@ public class Internship extends BaseEntity {
 
   @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<InternReport> internReports;
-
 
 }

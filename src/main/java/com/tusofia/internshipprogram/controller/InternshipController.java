@@ -1,8 +1,11 @@
 package com.tusofia.internshipprogram.controller;
 
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
+import com.tusofia.internshipprogram.dto.internship.AssignedInternDto;
+import com.tusofia.internshipprogram.dto.internship.FinishInternshipDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
+import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import com.tusofia.internshipprogram.service.InternshipService;
 import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +29,15 @@ public class InternshipController {
   }
 
   @GetMapping
-  public List<InternshipExtendedDto> getAllInternships() {
-    return internshipService.getAllInternships();
+  public List<InternshipExtendedDto> getAllActiveInternships() {
+    return internshipService.getAllActiveInternships();
   }
 
   @GetMapping("/employer")
-  public List<InternshipDto> getAllInternshipsForEmployer(Authentication authentication) {
+  public List<InternshipDto> getActiveInternshipsEmployer(@RequestParam("status") String status, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
-    return internshipService.getInternships(userEmail);
+    return internshipService.getEmployerInternshipsByStatus(userEmail, InternshipStatus.valueOf(status));
   }
 
   @GetMapping("/employer/{trackingNumber}")
@@ -51,6 +54,13 @@ public class InternshipController {
     return internshipService.getActiveInternInternships(userEmail);
   }
 
+  @GetMapping("/employer/assigned/{trackingNumber}")
+  public List<AssignedInternDto> getAssignedInterns(@PathVariable("trackingNumber") String trackingNumber, Authentication authentication) {
+    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
+
+    return internshipService.getAssignedInterns(trackingNumber, userEmail);
+  }
+
   @PostMapping
   public BaseResponseDto addNewInternship(@Valid @RequestBody InternshipDto internshipDto, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
@@ -63,6 +73,13 @@ public class InternshipController {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
     return internshipService.editInternship(internshipDto, userEmail);
+  }
+
+  @PutMapping("/employer/finish")
+  public BaseResponseDto finishInternship(@Valid @RequestBody FinishInternshipDto finishInternshipDto, Authentication authentication) {
+    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
+
+    return internshipService.finishInternship(finishInternshipDto, userEmail);
   }
 
   @DeleteMapping("employer/{trackingNumber}")

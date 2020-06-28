@@ -3,7 +3,6 @@ package com.tusofia.internshipprogram.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tusofia.internshipprogram.entity.BaseEntity;
 import com.tusofia.internshipprogram.enumeration.UserRole;
-import com.tusofia.internshipprogram.enumeration.UserStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,16 +33,12 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  private UserStatus status;
-
   private String profileImageName;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private InternDetails internDetails;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval=true)
   private EmployerDetails employerDetails;
 
 }

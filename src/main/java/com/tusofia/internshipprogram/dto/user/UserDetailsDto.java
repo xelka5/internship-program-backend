@@ -2,7 +2,6 @@ package com.tusofia.internshipprogram.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.tusofia.internshipprogram.enumeration.UserRole;
-import com.tusofia.internshipprogram.enumeration.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,5 +23,4 @@ public class UserDetailsDto {
 
   private Object userDetails;
 
-  private UserStatus status;
 }

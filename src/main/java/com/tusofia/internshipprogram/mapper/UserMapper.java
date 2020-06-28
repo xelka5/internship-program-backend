@@ -7,10 +7,12 @@ import com.tusofia.internshipprogram.entity.user.EmployerDetails;
 import com.tusofia.internshipprogram.entity.user.InternDetails;
 import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.UserRole;
-import com.tusofia.internshipprogram.enumeration.UserStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mapstruct.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
@@ -34,6 +36,7 @@ public interface UserMapper {
 
   InternUserDetailsDto internDetailsToInternUserDetailsDto(InternDetails internDetails);
 
+  @Mapping(target = "skills", source = "skills", qualifiedByName = "filterSkills")
   InternDetails internUserDetailsDtoToInternDetails(InternUserDetailsDto internUserDetailsDto);
 
   void updateInternUserDetails(InternUserDetailsDto internUpdateDetails, @MappingTarget InternDetails internDetails);
@@ -64,7 +67,6 @@ public interface UserMapper {
 
           internDetails.setUser(user);
           user.setInternDetails(internDetails);
-          UserStatus.setInitialUserStatusIfNotExists(user, UserStatus.ACTIVE);
           break;
         case EMPLOYER:
           EmployerUserDetailsDto employerUserDetailsDto =
@@ -75,17 +77,21 @@ public interface UserMapper {
             updateEmployerUserDetails(employerUserDetailsDto, user.getEmployerDetails());
           } else {
             employerDetails = employerUserDetailsDtoToEmployerDetails(employerUserDetailsDto);
+            user.setRole(UserRole.PENDING);
           }
 
           employerDetails.setUser(user);
           user.setEmployerDetails(employerDetails);
-          UserStatus.setInitialUserStatusIfNotExists(user, UserStatus.PENDING_REGISTRATION);
+
           break;
       }
     }
   }
 
-
+  @Named(value = "filterSkills")
+  default List<String> filterSkills(List<String> skills) {
+    return skills.stream().filter(skill -> !skill.isBlank()).collect(Collectors.toList());
+  }
 
   @Named(value = "hashPassword")
   default String hashPassword(String password) {

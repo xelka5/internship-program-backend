@@ -1,16 +1,19 @@
 package com.tusofia.internshipprogram.service;
 
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
+import com.tusofia.internshipprogram.dto.internship.AssignedInternDto;
+import com.tusofia.internshipprogram.dto.internship.FinishInternshipDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
+import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 
 import java.util.List;
 
 public interface InternshipService {
 
-  List<InternshipExtendedDto> getAllInternships();
+  List<InternshipExtendedDto> getAllActiveInternships();
 
-  List<InternshipDto> getInternships(String userEmail);
+  List<InternshipDto> getEmployerInternshipsByStatus(String userEmail, InternshipStatus status);
 
   BaseResponseDto addNewInternship(InternshipDto internshipDto, String userEmail);
 
@@ -21,4 +24,8 @@ public interface InternshipService {
   List<InternshipExtendedDto> getActiveInternInternships(String userEmail);
 
   BaseResponseDto deleteInternship(String trackingNumber, String userEmail);
+
+  BaseResponseDto finishInternship(FinishInternshipDto finishInternshipDto, String userEmail);
+
+  List<AssignedInternDto> getAssignedInterns(String trackingNumber, String userEmail);
 }

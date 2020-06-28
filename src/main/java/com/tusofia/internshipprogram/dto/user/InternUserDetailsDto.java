@@ -38,6 +38,5 @@ public class InternUserDetailsDto {
   @NotEmpty
   private String previousEducation;
 
-  @NotEmpty
   private List<String> skills;
 }

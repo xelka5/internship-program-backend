@@ -29,5 +29,6 @@ oauthData:
   jwtSigningKey: jWtS3cR3tH1gHS3cur3d
   authorizedGrantTypes: password,refresh_token
 
+# External source resource properties
 resources:
   profileImagesDirectory: profile-images

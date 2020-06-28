@@ -5,6 +5,7 @@ import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
 import com.tusofia.internshipprogram.dto.user.EmployerProfileDto;
 import com.tusofia.internshipprogram.entity.internship.Internship;
 import com.tusofia.internshipprogram.entity.user.User;
+import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Mapper(componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        imports = UUID.class)
+        imports = { UUID.class, InternshipStatus.class})
 public interface InternshipMapper {
 
   List<InternshipExtendedDto> internshipListToInternshipExtendedDtoList(List<Internship> internshipList);
@@ -27,6 +28,7 @@ public interface InternshipMapper {
   List<InternshipDto> internshipListToInternshipDtoList(List<Internship> internshipList);
 
   @Mapping(target = "trackingNumber", expression = "java( UUID.randomUUID().toString() )" )
+  @Mapping(target = "status", expression = "java( InternshipStatus.ACTIVE )" )
   Internship internshipDtoToInternship(InternshipDto internshipDto);
 
   void updateInternship(InternshipDto internshipDto, @MappingTarget Internship internship);
