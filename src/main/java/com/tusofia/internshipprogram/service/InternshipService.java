@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface InternshipService {
 
-  List<InternshipExtendedDto> getAllActiveInternships();
+  List<InternshipExtendedDto> getAllInternshipsByStatus(InternshipStatus status);
 
   List<InternshipDto> getEmployerInternshipsByStatus(String userEmail, InternshipStatus status);
 
@@ -21,7 +21,7 @@ public interface InternshipService {
 
   InternshipDto getInternshipByTrackingNumber(String trackingNumber, String userEmail);
 
-  List<InternshipExtendedDto> getActiveInternInternships(String userEmail);
+  List<InternshipExtendedDto> getInternInternshipsByStatus(String userEmail, InternshipStatus status);
 
   BaseResponseDto deleteInternship(String trackingNumber, String userEmail);
 

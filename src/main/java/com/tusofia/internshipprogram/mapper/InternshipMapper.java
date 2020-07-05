@@ -3,8 +3,10 @@ package com.tusofia.internshipprogram.mapper;
 import com.tusofia.internshipprogram.dto.internship.InternshipDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
 import com.tusofia.internshipprogram.dto.user.EmployerProfileDto;
+import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.internship.Internship;
 import com.tusofia.internshipprogram.entity.user.User;
+import com.tusofia.internshipprogram.enumeration.FinalReportType;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import org.mapstruct.*;
 
@@ -35,4 +37,26 @@ public interface InternshipMapper {
 
   InternshipDto internshipToInternshipDto(Internship internship);
 
+  List<InternshipExtendedDto> internshipApplicationListToInternshipExtendedDtoList(List<InternshipApplication> internshipApplications);
+
+  @Mapping(target = "trackingNumber", source = "internship.trackingNumber")
+  @Mapping(target = "title", source = "internship.title")
+  @Mapping(target = "description", source = "internship.description")
+  @Mapping(target = "startDate", source = "internship.startDate")
+  @Mapping(target = "duration", source = "internship.duration")
+  @Mapping(target = "durationUnit", source = "internship.durationUnit")
+  @Mapping(target = "type", source = "internship.type")
+  @Mapping(target = "salary", source = "internship.salary")
+  @Mapping(target = "currency", source = "internship.currency")
+  @Mapping(target = "employer", source = "internship.employer.user")
+  InternshipExtendedDto internshipApplicationToInternshipExtendedDto(InternshipApplication application);
+
+  @AfterMapping
+  default void mapInternFinalReportPresent(@MappingTarget InternshipExtendedDto internshipExtendedDto, InternshipApplication application) {
+    boolean reportIsPresent = application.getFinalReports()
+            .stream()
+            .anyMatch(report -> report.getFinalReportType() == FinalReportType.INTERN);
+
+    internshipExtendedDto.setInternReportPresent(reportIsPresent);
+  }
 }

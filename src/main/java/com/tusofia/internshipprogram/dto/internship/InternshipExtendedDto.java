@@ -37,4 +37,6 @@ public class InternshipExtendedDto {
   private Currency currency;
 
   private EmployerProfileDto employer;
+
+  private boolean internReportPresent;
 }

@@ -25,14 +25,21 @@ public class ReportController {
   public InternReportDto getInternReport(@PathVariable String reportTrackingNumber, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
-    return this.reportService.getInternReport(reportTrackingNumber, userEmail);
+    return reportService.getInternReport(reportTrackingNumber, userEmail);
   }
 
   @GetMapping("internship/{internshipTrackingNumber}")
   public List<InternReportDto> getInternReportsForInternship(@PathVariable String internshipTrackingNumber, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
-    return this.reportService.getInternReportsForInternship(internshipTrackingNumber, userEmail);
+    return reportService.getInternReportsByInternEmail(internshipTrackingNumber, userEmail);
+  }
+
+  @GetMapping("internship/{internshipTrackingNumber}/intern/{internEmail}")
+  public List<InternReportDto> getReportsByInternEmail(@PathVariable String internshipTrackingNumber,
+                                                       @PathVariable String internEmail) {
+
+    return reportService.getInternReportsByInternEmail(internshipTrackingNumber, internEmail);
   }
 
   @PostMapping

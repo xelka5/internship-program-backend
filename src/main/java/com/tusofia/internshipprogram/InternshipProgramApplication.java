@@ -24,8 +24,9 @@ public class InternshipProgramApplication implements CommandLineRunner {
 	public void run(String... args) {
 		try {
 			Files.createDirectories(Paths.get(applicationConfig.getProfileImagesDirectory()));
+			Files.createDirectories(Paths.get(applicationConfig.getFinalReportsDirectory()));
 		} catch (IOException e) {
-			throw new RuntimeException("Could not initialize folder for upload!");
+			throw new RuntimeException("Could not initialize directories!", e);
 		}
 	}
 }

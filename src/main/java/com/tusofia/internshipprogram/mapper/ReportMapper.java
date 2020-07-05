@@ -23,6 +23,7 @@ public interface ReportMapper {
 
   @Mapping(target = "internDetails", source = "user.internDetails")
   @Mapping(target = "trackingNumber", expression = "java( UUID.randomUUID().toString() )" )
-  InternReport internReportDtoUserAndInternshipToInternReport(InternReportDto internReportDto, User user, Internship internship);
+  InternReport internReportDtoUserAndInternshipToInternReport(InternReportDto internReportDto,
+                                                              User user, Internship internship);
 
 }

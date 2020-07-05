@@ -9,6 +9,7 @@ import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.internship.Internship;
 import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
+import com.tusofia.internshipprogram.enumeration.FinalReportType;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.exception.InsufficientRightsException;
@@ -70,8 +71,8 @@ public class InternshipServiceImpl implements InternshipService {
 
 
   @Override
-  public List<InternshipExtendedDto> getAllActiveInternships() {
-    List<Internship> internshipList = internshipRepository.findByStatusOrderByCreateDateDesc(InternshipStatus.ACTIVE);
+  public List<InternshipExtendedDto> getAllInternshipsByStatus(InternshipStatus status) {
+    List<Internship> internshipList = internshipRepository.findByStatusOrderByCreateDateDesc(status);
 
     return internshipMapper.internshipListToInternshipExtendedDtoList(internshipList);
   }
@@ -113,17 +114,26 @@ public class InternshipServiceImpl implements InternshipService {
   }
 
   @Override
-  public List<InternshipExtendedDto> getActiveInternInternships(String userEmail) {
+  public List<InternshipExtendedDto> getInternInternshipsByStatus(String userEmail, InternshipStatus internshipStatus) {
     User savedUser = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    List<Internship> acceptedInternships = savedUser.getInternDetails().getInternshipApplications()
+    List<InternshipApplication> acceptedApplications = savedUser.getInternDetails().getInternshipApplications()
             .stream()
-            .filter(application -> application.getStatus() == ApplicationStatus.ACCEPTED)
-            .map(InternshipApplication::getInternship)
+            .filter(application -> application.getStatus() == ApplicationStatus.ACCEPTED &&
+                    application.getInternship().getStatus() == internshipStatus)
             .collect(Collectors.toList());
 
-    return internshipMapper.internshipListToInternshipExtendedDtoList(acceptedInternships);
+    if(InternshipStatus.FINISHED == internshipStatus) {
+      return internshipMapper.internshipApplicationListToInternshipExtendedDtoList(acceptedApplications);
+    } else {
+      List<Internship> acceptedInternships = acceptedApplications
+        .stream()
+        .map(InternshipApplication::getInternship)
+        .collect(Collectors.toList());
+
+      return internshipMapper.internshipListToInternshipExtendedDtoList(acceptedInternships);
+    }
   }
 
   @Override

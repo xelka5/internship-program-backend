@@ -25,6 +25,8 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
+  private static final String DEFAULT_USER_IMAGE = "templates/default_user.png";
+
   private UserRepository userRepository;
   private UserMapper userMapper;
   private ApplicationConfig applicationConfig;
@@ -38,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDetailsResponseDto registerNewUser(UserDetailsDto newUserDetails) {
-    User newUser = userMapper.userDetailsDtoToUserEntity(newUserDetails);
+    User newUser = userMapper.userDetailsDtoToUser(newUserDetails);
 
     User savedUser = userRepository.save(newUser);
 
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService {
     User savedUser = userRepository.findByEmail(email)
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    UserDetailsDto userDetailsDto = userMapper.userEntityToUserDetailsDto(savedUser);
+    UserDetailsDto userDetailsDto = userMapper.userToUserDetailsDto(savedUser);
 
     switch(savedUser.getRole()) {
       case INTERN:
@@ -105,7 +107,7 @@ public class UserServiceImpl implements UserService {
 
       Files.copy(profileImage.getInputStream(), uploadImagesDirectory.resolve(uniqueImageName));
 
-      if(savedUser.getProfileImageName() != null) {
+      if(savedUser.getProfileImageName() != null && !savedUser.getProfileImageName().equals(DEFAULT_USER_IMAGE)) {
         String oldProfileImage = Arrays.stream(savedUser.getProfileImageName().split("/"))
                 .reduce((first, second) -> second)
                 .orElse(null);

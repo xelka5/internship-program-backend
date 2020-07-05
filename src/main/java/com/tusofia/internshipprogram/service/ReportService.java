@@ -11,7 +11,7 @@ public interface ReportService {
 
   BaseResponseDto createReport(InternReportDto internReport, String userEmail);
 
-  List<InternReportDto> getInternReportsForInternship(String internshipTrackingNumber, String userEmail);
+  List<InternReportDto> getInternReportsByInternEmail(String internshipTrackingNumber, String userEmail);
 
   BaseResponseDto editReport(InternReportDto internReport, String userEmail, String reportTrackingNumber);
 

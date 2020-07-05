@@ -24,12 +24,13 @@ public interface UserMapper {
   @Mapping(target = "account.username", source = "username")
   @Mapping(target = "account.password", ignore = true)
   @Mapping(target = "account.profileImageName", source = "profileImageName")
-  UserDetailsDto userEntityToUserDetailsDto(User user);
+  UserDetailsDto userToUserDetailsDto(User user);
 
   @Mapping(target = "email", source = "account.email")
   @Mapping(target = "username", source = "account.username")
   @Mapping(target = "password", source = "account.password", qualifiedByName = "hashPassword")
-  User userDetailsDtoToUserEntity(UserDetailsDto userDetailsDto);
+  @Mapping(target = "profileImageName", source = "account.profileImageName", defaultValue = "templates/default_user.png")
+  User userDetailsDtoToUser(UserDetailsDto userDetailsDto);
 
   @Mapping(target = "username", source = "account.username")
   void updateUserDetails(UserDetailsDto updatedUserDetails, @MappingTarget User user);
@@ -82,7 +83,6 @@ public interface UserMapper {
 
           employerDetails.setUser(user);
           user.setEmployerDetails(employerDetails);
-
           break;
       }
     }

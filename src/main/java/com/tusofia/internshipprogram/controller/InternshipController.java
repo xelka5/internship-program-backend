@@ -29,12 +29,19 @@ public class InternshipController {
   }
 
   @GetMapping
-  public List<InternshipExtendedDto> getAllActiveInternships() {
-    return internshipService.getAllActiveInternships();
+  public List<InternshipExtendedDto> getAllInternshipsByStatus(@RequestParam("status") String status) {
+    return internshipService.getAllInternshipsByStatus(InternshipStatus.valueOf(status));
+  }
+
+  @GetMapping("/assigned")
+  public List<InternshipExtendedDto> getAssignedInternInternshipsByStatus(@RequestParam("status") String status, Authentication authentication) {
+    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
+
+    return internshipService.getInternInternshipsByStatus(userEmail, InternshipStatus.valueOf(status));
   }
 
   @GetMapping("/employer")
-  public List<InternshipDto> getActiveInternshipsEmployer(@RequestParam("status") String status, Authentication authentication) {
+  public List<InternshipDto> getEmployerInternshipsByStatus(@RequestParam("status") String status, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
     return internshipService.getEmployerInternshipsByStatus(userEmail, InternshipStatus.valueOf(status));
@@ -45,13 +52,6 @@ public class InternshipController {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
 
     return internshipService.getInternshipByTrackingNumber(trackingNumber, userEmail);
-  }
-
-  @GetMapping("/active")
-  public List<InternshipExtendedDto> getActiveInternInternships(Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return internshipService.getActiveInternInternships(userEmail);
   }
 
   @GetMapping("/employer/assigned/{trackingNumber}")

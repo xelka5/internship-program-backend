@@ -34,5 +34,4 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
       .authenticated();
   }
 
-
 }

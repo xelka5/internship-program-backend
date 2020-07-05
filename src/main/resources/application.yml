@@ -32,3 +32,4 @@ oauthData:
 # External source resource properties
 resources:
   profileImagesDirectory: profile-images
+  finalReportsDirectory: final-reports

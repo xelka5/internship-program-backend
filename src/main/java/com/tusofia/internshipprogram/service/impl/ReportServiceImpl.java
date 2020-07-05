@@ -66,11 +66,11 @@ public class ReportServiceImpl implements ReportService {
   }
 
   @Override
-  public List<InternReportDto> getInternReportsForInternship(String internshipTrackingNumber, String userEmail) {
-    User savedUser = userRepository.findByEmail(userEmail)
+  public List<InternReportDto> getInternReportsByInternEmail(String internshipTrackingNumber, String internEmail) {
+    User intern = userRepository.findByEmail(internEmail)
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    InternDetails internDetails = savedUser.getInternDetails();
+    InternDetails internDetails = intern.getInternDetails();
 
     List<InternReport> reports = internDetails.getInternReports()
             .stream()

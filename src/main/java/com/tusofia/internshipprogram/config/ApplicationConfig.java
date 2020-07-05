@@ -9,7 +9,14 @@ public class ApplicationConfig {
   @Value("${resources.profileImagesDirectory}")
   private String profileImagesDirectory;
 
+  @Value("${resources.finalReportsDirectory}")
+  private String finalReportsDirectory;
+
   public String getProfileImagesDirectory() {
     return profileImagesDirectory;
+  }
+
+  public String getFinalReportsDirectory() {
+    return finalReportsDirectory;
   }
 }

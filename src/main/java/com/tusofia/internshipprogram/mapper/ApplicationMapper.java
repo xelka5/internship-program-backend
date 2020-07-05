@@ -24,7 +24,8 @@ import java.util.UUID;
         imports = UUID.class)
 public interface ApplicationMapper {
 
-  List<ApplicationDetailsDto> internshipApplicationListToApplicationDetailsDtoList(List<InternshipApplication> internshipApplicationList);
+  List<ApplicationDetailsDto> internshipApplicationListToApplicationDetailsDtoList(
+          List<InternshipApplication> internshipApplicationList);
 
   @Mapping(target = "internshipDetails", source = "internship")
   ApplicationDetailsDto internshipApplicationToApplicationDetailsDto(InternshipApplication internshipApplication);
@@ -36,9 +37,11 @@ public interface ApplicationMapper {
   EmployerProfileDto userToEmployerProfileDto(User user);
 
   @Mapping(target = "trackingNumber", expression = "java( UUID.randomUUID().toString() )" )
-  InternshipApplication internshipApplicationDtoToInternshipApplication(InternshipApplicationDto internshipApplicationDto);
+  InternshipApplication internshipApplicationDtoToInternshipApplication(
+          InternshipApplicationDto internshipApplicationDto);
 
-  List<PendingApplicationDto> internshipApplicationListToPendingApplicationDtoList(List<InternshipApplication> internshipApplicationList);
+  List<PendingApplicationDto> internshipApplicationListToPendingApplicationDtoList(
+          List<InternshipApplication> internshipApplicationList);
 
   @Mapping(target = "intern", source = "internDetails.user")
   @Mapping(target = "internshipDetails", source = "internship")
@@ -48,7 +51,8 @@ public interface ApplicationMapper {
   @Mapping(target = "lastName", source = "internDetails.lastName")
   InternProfileDto userToInternProfileDto(User user);
 
-  List<AssignedInternDto> internshipApplicationListToAssignedInternDtoList(List<InternshipApplication> internshipApplicationList);
+  List<AssignedInternDto> internshipApplicationListToAssignedInternDtoList(
+          List<InternshipApplication> internshipApplicationList);
 
   @Mapping(target = "firstName", source = "internDetails.firstName")
   @Mapping(target = "lastName", source = "internDetails.lastName")
