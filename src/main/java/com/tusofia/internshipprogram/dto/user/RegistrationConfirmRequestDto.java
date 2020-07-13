@@ -1,18 +1,21 @@
-package com.tusofia.internshipprogram.dto.admin;
+package com.tusofia.internshipprogram.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.tusofia.internshipprogram.enumeration.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UpdatePendingApprovalDto {
+public class RegistrationConfirmRequestDto {
 
+  @NotEmpty
   private String userEmail;
 
-  private Boolean userAllowed;
+  @NotEmpty
+  private String token;
 }

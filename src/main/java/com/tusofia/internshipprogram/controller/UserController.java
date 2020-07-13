@@ -1,10 +1,9 @@
 package com.tusofia.internshipprogram.controller;
 
+import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckRequestDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckResponseDto;
-import com.tusofia.internshipprogram.dto.user.UploadImageResponseDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
+import com.tusofia.internshipprogram.dto.user.*;
 import com.tusofia.internshipprogram.service.UserService;
 import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,16 @@ public class UserController {
     return userService.getUserDetails(userEmail);
   }
 
+  @PostMapping("/reset-password/request")
+  public BaseResponseDto requestResetPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequest) {
+    return userService.requestResetPassword(forgotPasswordRequest);
+  }
+
+  @PostMapping("/reset-password/confirm")
+  public BaseResponseDto confirmResetPassword(@Valid @RequestBody ResetPasswordRequestDto resetPasswordRequest) {
+    return userService.confirmResetPassword(resetPasswordRequest);
+  }
+
   @PostMapping("/registration")
   public UserDetailsResponseDto registerNewUser(@Valid @RequestBody UserDetailsDto registrationRequest) {
     return userService.registerNewUser(registrationRequest);
@@ -52,6 +61,11 @@ public class UserController {
   @PostMapping("/registration/email-check")
   public EmailCheckResponseDto checkEmail(@Valid @RequestBody EmailCheckRequestDto emailCheckRequest) {
     return userService.checkEmail(emailCheckRequest);
+  }
+
+  @PostMapping("/registration/confirm")
+  public BaseResponseDto confirmRegistration(@Valid @RequestBody RegistrationConfirmRequestDto registrationConfirmRequest) {
+    return userService.confirmRegistration(registrationConfirmRequest);
   }
 
   @PostMapping("registration/upload")

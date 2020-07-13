@@ -16,5 +16,4 @@ public interface ReportService {
   BaseResponseDto editReport(InternReportDto internReport, String userEmail, String reportTrackingNumber);
 
   BaseResponseDto deleteReport(String reportTrackingNumber, String userEmail);
-
 }

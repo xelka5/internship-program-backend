@@ -13,6 +13,7 @@ import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import com.tusofia.internshipprogram.enumeration.UserRole;
+import com.tusofia.internshipprogram.enumeration.UserStatus;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.mapper.AdminMapper;
 import com.tusofia.internshipprogram.mapper.FinalReportMapper;
@@ -47,7 +48,7 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public List<UserDetailsDto> getPendingRegistrationUsers() {
 
-    List<User> pendingUsers = userRepository.findByRole(UserRole.PENDING);
+    List<User> pendingUsers = userRepository.findByUserAllowed(Boolean.FALSE);
 
     return adminMapper.pendingUserListToUserDetailsDtoList(pendingUsers);
   }
@@ -65,7 +66,11 @@ public class AdminServiceImpl implements AdminService {
     User updatingUser = userRepository.findByEmail(updatePendingApprovalDto.getUserEmail())
             .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-    updatingUser.setRole(updatePendingApprovalDto.getNewUserStatus());
+    if(updatePendingApprovalDto.getUserAllowed()) {
+      updatingUser.setUserAllowed(Boolean.TRUE);
+    } else {
+      updatingUser.setUserStatus(UserStatus.BLOCKED);
+    }
 
     userRepository.save(updatingUser);
 

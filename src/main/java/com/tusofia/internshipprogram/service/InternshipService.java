@@ -28,4 +28,6 @@ public interface InternshipService {
   BaseResponseDto finishInternship(FinishInternshipDto finishInternshipDto, String userEmail);
 
   List<AssignedInternDto> getAssignedInterns(String trackingNumber, String userEmail);
+
+  List<InternshipExtendedDto> searchActiveInternships(String searchTerm);
 }

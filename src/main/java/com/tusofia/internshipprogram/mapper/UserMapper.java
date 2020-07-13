@@ -7,6 +7,7 @@ import com.tusofia.internshipprogram.entity.user.EmployerDetails;
 import com.tusofia.internshipprogram.entity.user.InternDetails;
 import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.UserRole;
+import com.tusofia.internshipprogram.enumeration.UserStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mapstruct.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -63,6 +64,7 @@ public interface UserMapper {
           if(internDetails != null) {
             updateInternUserDetails(internUserDetailsDto, user.getInternDetails());
           } else {
+            user.setUserAllowed(Boolean.TRUE);
             internDetails = internUserDetailsDtoToInternDetails(internUserDetailsDto);
           }
 
@@ -77,14 +79,16 @@ public interface UserMapper {
           if(employerDetails != null) {
             updateEmployerUserDetails(employerUserDetailsDto, user.getEmployerDetails());
           } else {
+            user.setUserAllowed(Boolean.FALSE);
             employerDetails = employerUserDetailsDtoToEmployerDetails(employerUserDetailsDto);
-            user.setRole(UserRole.PENDING);
           }
 
           employerDetails.setUser(user);
           user.setEmployerDetails(employerDetails);
           break;
       }
+
+      user.setUserStatus(UserStatus.PENDING_CONFIRMATION);
     }
   }
 

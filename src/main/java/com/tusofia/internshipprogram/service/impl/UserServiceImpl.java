@@ -1,17 +1,23 @@
 package com.tusofia.internshipprogram.service.impl;
 
 import com.tusofia.internshipprogram.config.ApplicationConfig;
+import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckRequestDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckResponseDto;
-import com.tusofia.internshipprogram.dto.user.UploadImageResponseDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
+import com.tusofia.internshipprogram.dto.user.*;
 import com.tusofia.internshipprogram.entity.user.User;
+import com.tusofia.internshipprogram.enumeration.UserStatus;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
+import com.tusofia.internshipprogram.exception.InsufficientRightsException;
+import com.tusofia.internshipprogram.mail.resetPassword.ResetPasswordMail;
+import com.tusofia.internshipprogram.mail.userConfirm.UserConfirmationMail;
 import com.tusofia.internshipprogram.mapper.UserMapper;
 import com.tusofia.internshipprogram.repository.UserRepository;
+import com.tusofia.internshipprogram.service.EmailService;
 import com.tusofia.internshipprogram.service.UserService;
+import com.tusofia.internshipprogram.util.cache.CacheHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,12 +36,17 @@ public class UserServiceImpl implements UserService {
   private UserRepository userRepository;
   private UserMapper userMapper;
   private ApplicationConfig applicationConfig;
+  private CacheHelper cacheHelper;
+  private EmailService emailService;
 
   @Autowired
-  public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ApplicationConfig applicationConfig) {
+  public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
+                         ApplicationConfig applicationConfig, CacheHelper cacheHelper, EmailService emailService) {
     this.userRepository = userRepository;
     this.userMapper = userMapper;
     this.applicationConfig = applicationConfig;
+    this.cacheHelper = cacheHelper;
+    this.emailService = emailService;
   }
 
   @Override
@@ -43,6 +54,8 @@ public class UserServiceImpl implements UserService {
     User newUser = userMapper.userDetailsDtoToUser(newUserDetails);
 
     User savedUser = userRepository.save(newUser);
+
+    sendConfirmationEmail(savedUser.getEmail());
 
     return new UserDetailsResponseDto(savedUser.getEmail(), true);
   }
@@ -123,5 +136,71 @@ public class UserServiceImpl implements UserService {
     }
 
     return new UploadImageResponseDto(true);
+  }
+
+  @Override
+  public BaseResponseDto confirmRegistration(RegistrationConfirmRequestDto registrationConfirmRequest) {
+    String userEmail = registrationConfirmRequest.getUserEmail();
+    String token = cacheHelper.getRegisterConfirmationCache().get(userEmail);
+
+    if(!token.equals(registrationConfirmRequest.getToken())) {
+      throw new InsufficientRightsException("User cannot confirm registration");
+    }
+
+    User savedUser = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+    savedUser.setUserStatus(UserStatus.ACTIVE);
+
+    userRepository.save(savedUser);
+
+    return new BaseResponseDto(true);
+  }
+
+  @Override
+  public BaseResponseDto requestResetPassword(ForgotPasswordRequestDto forgotPasswordRequest) {
+    String userEmail = forgotPasswordRequest.getUserEmail();
+
+    User savedUser = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+    String resetCode = UUID.randomUUID().toString().substring(0, 7);
+    cacheHelper.getForgotPasswordCache().put(userEmail, resetCode);
+
+    ResetPasswordMail resetPasswordMail = new ResetPasswordMail(userEmail, resetCode);
+
+    emailService.sendMessage(resetPasswordMail);
+
+    return new BaseResponseDto(true);
+  }
+
+  @Override
+  public BaseResponseDto confirmResetPassword(ResetPasswordRequestDto resetPasswordRequest) {
+    String userEmail = resetPasswordRequest.getUserEmail();
+
+    User savedUser = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+    String resetCode = cacheHelper.getForgotPasswordCache().get(userEmail);
+
+    if(!resetPasswordRequest.getResetCode().equals(resetCode)) {
+      throw new InsufficientRightsException("Invalid reset code, please enter a valid one");
+    }
+
+    savedUser.setPassword(new BCryptPasswordEncoder().encode(resetPasswordRequest.getNewPassword()));
+
+    userRepository.save(savedUser);
+
+    return new BaseResponseDto(true);
+  }
+
+  private void sendConfirmationEmail(String userEmail) {
+    String generatedToken = UUID.randomUUID().toString();
+    cacheHelper.getRegisterConfirmationCache().put(userEmail, generatedToken);
+
+    UserConfirmationMail userConfirmationMail = new UserConfirmationMail(userEmail, generatedToken,
+            applicationConfig.getEnvironmentUrl());
+
+    emailService.sendMessage(userConfirmationMail);
   }
 }

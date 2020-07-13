@@ -6,6 +6,7 @@ import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
 import com.tusofia.internshipprogram.entity.user.InternDetails;
 import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.UserRole;
+import com.tusofia.internshipprogram.enumeration.UserStatus;
 import com.tusofia.internshipprogram.mapper.UserMapper;
 import com.tusofia.internshipprogram.repository.UserRepository;
 import org.junit.Before;
@@ -67,7 +68,7 @@ public class UserServiceImplTest {
 
   private User createNewUser() {
     return new User(TEST_USERNAME, passwordEncoder.encode(TEST_PASSWORD),
-            TEST_EMAIL, UserRole.INTERN, TEST_PROFILE_IMAGE, new InternDetails(), null);
+            TEST_EMAIL, UserStatus.ACTIVE, true, UserRole.INTERN, TEST_PROFILE_IMAGE, new InternDetails(), null);
   }
 
 }

@@ -33,6 +33,11 @@ public class InternshipController {
     return internshipService.getAllInternshipsByStatus(InternshipStatus.valueOf(status));
   }
 
+  @GetMapping("/search")
+  public List<InternshipExtendedDto> searchActiveInternships(@RequestParam("searchTerm") String searchTerm) {
+    return internshipService.searchActiveInternships(searchTerm);
+  }
+
   @GetMapping("/assigned")
   public List<InternshipExtendedDto> getAssignedInternInternshipsByStatus(@RequestParam("status") String status, Authentication authentication) {
     String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);

@@ -1,10 +1,9 @@
 package com.tusofia.internshipprogram.service;
 
+import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckRequestDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckResponseDto;
-import com.tusofia.internshipprogram.dto.user.UploadImageResponseDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
-import com.tusofia.internshipprogram.dto.user.UserDetailsResponseDto;
+import com.tusofia.internshipprogram.dto.user.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -18,4 +17,10 @@ public interface UserService {
   UserDetailsDto getUserDetails(String userEmail);
 
   UploadImageResponseDto uploadProfileImage(MultipartFile profileImage, String userEmail);
+
+  BaseResponseDto confirmRegistration(RegistrationConfirmRequestDto registrationConfirmRequest);
+
+  BaseResponseDto requestResetPassword(ForgotPasswordRequestDto forgotPasswordRequest);
+
+  BaseResponseDto confirmResetPassword(ResetPasswordRequestDto resetPasswordRequest);
 }

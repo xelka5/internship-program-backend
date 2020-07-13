@@ -3,6 +3,7 @@ package com.tusofia.internshipprogram.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tusofia.internshipprogram.entity.BaseEntity;
 import com.tusofia.internshipprogram.enumeration.UserRole;
+import com.tusofia.internshipprogram.enumeration.UserStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,6 +29,13 @@ public class User extends BaseEntity {
   @NotEmpty
   @Email
   private String email;
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  private UserStatus userStatus;
+
+  @NotNull
+  private Boolean userAllowed;
 
   @NotNull
   @Enumerated(EnumType.STRING)

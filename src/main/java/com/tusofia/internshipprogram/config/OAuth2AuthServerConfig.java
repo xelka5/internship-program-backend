@@ -39,6 +39,7 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
   private final AuthenticationManager authenticationManager;
 
   public static final String USER_EMAIL_LABEL = "user_email";
+  public static final String USER_STATUS_LABEL = "user_status";
 
   @Value("${oauthData.clientId}")
   private String clientId;
@@ -110,6 +111,7 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
         CustomUserPrincipal userPrincipal = (CustomUserPrincipal) authentication.getPrincipal();
         Map<String, Object> additionalInfo = new HashMap<>();
         additionalInfo.put(USER_EMAIL_LABEL, userPrincipal.getEmail());
+        additionalInfo.put(USER_STATUS_LABEL, userPrincipal.getUserStatus());
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
       }
       return accessToken;

@@ -6,6 +6,7 @@ import com.tusofia.internshipprogram.dto.finalReport.FinalReportAdminDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
 import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
 import com.tusofia.internshipprogram.service.AdminService;
+import com.tusofia.internshipprogram.service.impl.EmailServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,9 +17,11 @@ import java.util.List;
 public class AdminController {
 
   private AdminService adminService;
+  private EmailServiceImpl emailService;
 
-  public AdminController(AdminService adminService) {
+  public AdminController(AdminService adminService, EmailServiceImpl emailService) {
     this.adminService = adminService;
+    this.emailService = emailService;
   }
 
   @GetMapping("/pending")

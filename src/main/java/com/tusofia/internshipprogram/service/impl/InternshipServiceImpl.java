@@ -9,7 +9,6 @@ import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.internship.Internship;
 import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
-import com.tusofia.internshipprogram.enumeration.FinalReportType;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.exception.InsufficientRightsException;
@@ -197,6 +196,14 @@ public class InternshipServiceImpl implements InternshipService {
             .collect(Collectors.toList());
 
     return applicationMapper.internshipApplicationListToAssignedInternDtoList(assignedInterns);
+  }
+
+  @Override
+  public List<InternshipExtendedDto> searchActiveInternships(String searchTerm) {
+    List<Internship> filteredInternships =
+            internshipRepository.findByStatusAndTitleContainingOrDescriptionContaining(InternshipStatus.ACTIVE, searchTerm, searchTerm);
+
+    return internshipMapper.internshipListToInternshipExtendedDtoList(filteredInternships);
   }
 
 }
