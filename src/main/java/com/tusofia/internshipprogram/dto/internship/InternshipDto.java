@@ -47,4 +47,6 @@ public class InternshipDto {
 
   @NotNull
   private Integer maxNumberOfStudents;
+
+  private Long numberOfAssignedStudents;
 }

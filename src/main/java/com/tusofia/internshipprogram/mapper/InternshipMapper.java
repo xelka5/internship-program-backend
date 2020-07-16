@@ -6,12 +6,14 @@ import com.tusofia.internshipprogram.dto.user.EmployerProfileDto;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.internship.Internship;
 import com.tusofia.internshipprogram.entity.user.User;
+import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.enumeration.FinalReportType;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import org.mapstruct.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
@@ -37,6 +39,17 @@ public interface InternshipMapper {
 
   InternshipDto internshipToInternshipDto(Internship internship);
 
+  @AfterMapping
+  default void mapNumberOfAssignedInterns(@MappingTarget InternshipDto internshipDto, Internship internship) {
+
+    long numberOfAssignedStudents = internship.getApplications()
+            .stream()
+            .filter(application -> application.getStatus() == ApplicationStatus.ACCEPTED)
+            .count();
+
+    internshipDto.setNumberOfAssignedStudents(numberOfAssignedStudents);
+  }
+
   List<InternshipExtendedDto> internshipApplicationListToInternshipExtendedDtoList(List<InternshipApplication> internshipApplications);
 
   @Mapping(target = "trackingNumber", source = "internship.trackingNumber")
@@ -59,4 +72,6 @@ public interface InternshipMapper {
 
     internshipExtendedDto.setInternReportPresent(reportIsPresent);
   }
+
+
 }

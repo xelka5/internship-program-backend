@@ -8,3 +8,7 @@ spring:
 # Cross origin resource sharing properties
 cors:
   allowedOrigin: 'http://localhost:4300'
+
+# External source resource properties
+resources:
+  environment-url: http://localhost:4300

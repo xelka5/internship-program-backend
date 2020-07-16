@@ -65,6 +65,7 @@ public interface UserMapper {
             updateInternUserDetails(internUserDetailsDto, user.getInternDetails());
           } else {
             user.setUserAllowed(Boolean.TRUE);
+            user.setUserStatus(UserStatus.PENDING_CONFIRMATION);
             internDetails = internUserDetailsDtoToInternDetails(internUserDetailsDto);
           }
 
@@ -80,6 +81,7 @@ public interface UserMapper {
             updateEmployerUserDetails(employerUserDetailsDto, user.getEmployerDetails());
           } else {
             user.setUserAllowed(Boolean.FALSE);
+            user.setUserStatus(UserStatus.PENDING_CONFIRMATION);
             employerDetails = employerUserDetailsDtoToEmployerDetails(employerUserDetailsDto);
           }
 
@@ -87,8 +89,6 @@ public interface UserMapper {
           user.setEmployerDetails(employerDetails);
           break;
       }
-
-      user.setUserStatus(UserStatus.PENDING_CONFIRMATION);
     }
   }
 

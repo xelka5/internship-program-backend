@@ -5,6 +5,7 @@ import com.tusofia.internshipprogram.dto.error.ErrorDto;
 import com.tusofia.internshipprogram.exception.AlreadyAppliedException;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.exception.InsufficientRightsException;
+import com.tusofia.internshipprogram.exception.InternshipFullException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,13 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler({ InsufficientRightsException.class })
   public ResponseEntity<Object> handleInsufficientRightsException(InsufficientRightsException ex) {
+    ErrorDto errorDto = new ErrorDto(HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), null);
+
+    return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
+  }
+
+  @ExceptionHandler({ InternshipFullException.class })
+  public ResponseEntity<Object> handleInternshipFullException(InternshipFullException ex) {
     ErrorDto errorDto = new ErrorDto(HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), null);
 
     return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());

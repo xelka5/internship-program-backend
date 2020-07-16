@@ -1,6 +1,8 @@
 HELP.md
 target/
 profile-images/
+final-reports/
+
 !**/src/main/**
 !**/src/test/**
 mvnw

@@ -12,10 +12,12 @@ import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.exception.InsufficientRightsException;
+import com.tusofia.internshipprogram.mail.internshipDeleted.InternshipDeletedMail;
 import com.tusofia.internshipprogram.mapper.ApplicationMapper;
 import com.tusofia.internshipprogram.mapper.InternshipMapper;
 import com.tusofia.internshipprogram.repository.InternshipRepository;
 import com.tusofia.internshipprogram.repository.UserRepository;
+import com.tusofia.internshipprogram.service.EmailService;
 import com.tusofia.internshipprogram.service.InternshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,16 +32,19 @@ public class InternshipServiceImpl implements InternshipService {
   private InternshipMapper internshipMapper;
   private ApplicationMapper applicationMapper;
   private UserRepository userRepository;
+  private EmailService emailService;
 
   @Autowired
   public InternshipServiceImpl(InternshipRepository internshipRepository,
                                InternshipMapper internshipMapper,
                                ApplicationMapper applicationMapper,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               EmailService emailService) {
     this.internshipRepository = internshipRepository;
     this.internshipMapper = internshipMapper;
     this.applicationMapper = applicationMapper;
     this.userRepository = userRepository;
+    this.emailService = emailService;
   }
 
   @Override
@@ -148,9 +153,24 @@ public class InternshipServiceImpl implements InternshipService {
             .findAny()
             .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
 
-    internshipRepository.delete(savedInternship);
+    savedInternship.setStatus(InternshipStatus.CANCELLED);
+
+    savedInternship.getApplications().forEach(application -> {
+      application.setStatus(ApplicationStatus.CANCELLED);
+      sendInternshipDeletedMail(application, savedInternship);
+    });
+
+    internshipRepository.save(savedInternship);
 
     return new BaseResponseDto(true);
+  }
+
+  private void sendInternshipDeletedMail(InternshipApplication application, Internship savedInternship) {
+    String sendToEmail = application.getInternDetails().getUser().getEmail();
+    String companyName = savedInternship.getEmployer().getCompanyName();
+    InternshipDeletedMail internshipDeletedMail = new InternshipDeletedMail(sendToEmail, companyName, savedInternship.getTitle());
+
+    emailService.sendMessage(internshipDeletedMail);
   }
 
   @Override

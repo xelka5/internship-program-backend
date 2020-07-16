@@ -13,11 +13,14 @@ import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.exception.AlreadyAppliedException;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.exception.InsufficientRightsException;
+import com.tusofia.internshipprogram.exception.InternshipFullException;
+import com.tusofia.internshipprogram.mail.applicationResponse.ApplicationResponseMail;
 import com.tusofia.internshipprogram.mapper.ApplicationMapper;
 import com.tusofia.internshipprogram.repository.ApplicationRepository;
 import com.tusofia.internshipprogram.repository.InternshipRepository;
 import com.tusofia.internshipprogram.repository.UserRepository;
 import com.tusofia.internshipprogram.service.ApplicationService;
+import com.tusofia.internshipprogram.service.EmailService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,15 +34,18 @@ public class ApplicationServiceImpl implements ApplicationService {
   private InternshipRepository internshipRepository;
   private UserRepository userRepository;
   private ApplicationMapper applicationMapper;
+  private EmailService emailService;
 
   public ApplicationServiceImpl(ApplicationRepository applicationRepository,
                                 InternshipRepository internshipRepository,
                                 UserRepository userRepository,
-                                ApplicationMapper applicationMapper) {
+                                ApplicationMapper applicationMapper,
+                                EmailService emailService) {
     this.applicationRepository = applicationRepository;
     this.internshipRepository = internshipRepository;
     this.userRepository = userRepository;
     this.applicationMapper = applicationMapper;
+    this.emailService = emailService;
   }
 
   @Override
@@ -68,6 +74,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     if(alreadyApplied) {
       throw new AlreadyAppliedException("You already applied for this internship");
+    }
+
+    if(internship.getApplications().size() >= internship.getMaxNumberOfStudents()) {
+      throw new InternshipFullException("Internship is full");
     }
 
     InternshipApplication newApplication =
@@ -116,8 +126,20 @@ public class ApplicationServiceImpl implements ApplicationService {
     internshipApplication.setResponseNotes(applicationResponseDto.getResponseNotes());
     internshipApplication.setStatus(applicationResponseDto.getStatus());
 
+    sendApplicationResponseMail(internshipApplication);
+
     applicationRepository.save(internshipApplication);
 
     return new BaseResponseDto(true);
+  }
+
+  public void sendApplicationResponseMail(InternshipApplication application) {
+    String sendToEmail = application.getInternDetails().getUser().getEmail();
+    String internshipTitle = application.getInternship().getTitle();
+    String response = application.getStatus() == ApplicationStatus.ACCEPTED ? "accepted" : "rejected";
+
+    ApplicationResponseMail applicationResponseMail = new ApplicationResponseMail(sendToEmail, internshipTitle, response);
+
+    this.emailService.sendMessage(applicationResponseMail);
   }
 }

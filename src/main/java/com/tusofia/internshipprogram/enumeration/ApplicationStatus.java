@@ -1,5 +1,5 @@
 package com.tusofia.internshipprogram.enumeration;
 
 public enum ApplicationStatus {
-  PENDING, ACCEPTED, REJECTED;
+  PENDING, ACCEPTED, REJECTED, CANCELLED;
 }
