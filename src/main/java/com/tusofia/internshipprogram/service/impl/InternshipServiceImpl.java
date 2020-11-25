@@ -25,6 +25,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.tusofia.internshipprogram.util.GlobalConstants.*;
+
+
 @Service
 public class InternshipServiceImpl implements InternshipService {
 
@@ -50,7 +53,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public BaseResponseDto addNewInternship(InternshipDto internshipDto, String userEmail) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     Internship newInternship = internshipMapper.internshipDtoToInternship(internshipDto);
     newInternship.setEmployer(savedUser.getEmployerDetails());
@@ -63,7 +66,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public List<InternshipDto> getEmployerInternshipsByStatus(String userEmail, InternshipStatus status) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<Internship> activeEmployerInternships = savedUser.getEmployerDetails().getInternships()
             .stream()
@@ -84,7 +87,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public BaseResponseDto editInternship(InternshipDto internshipDto, String userEmail) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
@@ -92,7 +95,7 @@ public class InternshipServiceImpl implements InternshipService {
             .stream()
             .filter(internship -> internship.getTrackingNumber().equals(internshipDto.getTrackingNumber()))
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     internshipMapper.updateInternship(internshipDto, savedInternship);
 
@@ -104,7 +107,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public InternshipDto getInternshipByTrackingNumber(String trackingNumber, String userEmail) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
@@ -112,7 +115,7 @@ public class InternshipServiceImpl implements InternshipService {
             .stream()
             .filter(internship -> internship.getTrackingNumber().equals(trackingNumber))
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     return internshipMapper.internshipToInternshipDto(savedInternship);
   }
@@ -120,7 +123,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public List<InternshipExtendedDto> getInternInternshipsByStatus(String userEmail, InternshipStatus internshipStatus) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<InternshipApplication> acceptedApplications = savedUser.getInternDetails().getInternshipApplications()
             .stream()
@@ -128,13 +131,13 @@ public class InternshipServiceImpl implements InternshipService {
                     application.getInternship().getStatus() == internshipStatus)
             .collect(Collectors.toList());
 
-    if(InternshipStatus.FINISHED == internshipStatus) {
+    if (InternshipStatus.FINISHED == internshipStatus) {
       return internshipMapper.internshipApplicationListToInternshipExtendedDtoList(acceptedApplications);
     } else {
       List<Internship> acceptedInternships = acceptedApplications
-        .stream()
-        .map(InternshipApplication::getInternship)
-        .collect(Collectors.toList());
+              .stream()
+              .map(InternshipApplication::getInternship)
+              .collect(Collectors.toList());
 
       return internshipMapper.internshipListToInternshipExtendedDtoList(acceptedInternships);
     }
@@ -143,7 +146,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public BaseResponseDto deleteInternship(String trackingNumber, String userEmail) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
@@ -151,7 +154,7 @@ public class InternshipServiceImpl implements InternshipService {
             .stream()
             .filter(internship -> internship.getTrackingNumber().equals(trackingNumber))
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     savedInternship.setStatus(InternshipStatus.CANCELLED);
 
@@ -176,7 +179,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public BaseResponseDto finishInternship(FinishInternshipDto finishInternshipDto, String userEmail) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
@@ -184,10 +187,10 @@ public class InternshipServiceImpl implements InternshipService {
             .stream()
             .filter(internship -> internship.getTrackingNumber().equals(finishInternshipDto.getTrackingNumber()))
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
-    if(savedInternship.getStatus() != InternshipStatus.ACTIVE) {
-      throw new InsufficientRightsException("Only active internships can be finished");
+    if (savedInternship.getStatus() != InternshipStatus.ACTIVE) {
+      throw new InsufficientRightsException(ACTIVE_INTERNSHIPS_CAN_BE_FINISHED_MESSAGE);
     }
 
     savedInternship.setStatus(InternshipStatus.FINISHED);
@@ -200,7 +203,7 @@ public class InternshipServiceImpl implements InternshipService {
   @Override
   public List<AssignedInternDto> getAssignedInterns(String trackingNumber, String userEmail) {
     User savedUser = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
     List<Internship> internshipList = savedUser.getEmployerDetails().getInternships();
 
@@ -208,7 +211,7 @@ public class InternshipServiceImpl implements InternshipService {
             .stream()
             .filter(internship -> internship.getTrackingNumber().equals(trackingNumber))
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     List<InternshipApplication> assignedInterns = savedInternship.getApplications()
             .stream()

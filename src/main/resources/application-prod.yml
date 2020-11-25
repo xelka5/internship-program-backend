@@ -1,7 +1,7 @@
 # Spring Framework properties
 spring:
   datasource:
-    url : 'jdbc:mysql://db:3306/internship-program?allowPublicKeyRetrieval=true&useSSL=false'
+    url : 'jdbc:mysql://internship-program-db-prod:3306/internship-program?allowPublicKeyRetrieval=true&useSSL=false'
     username : '@dm1nUser11'
     password : 'us3rp@ssw0rD12'
 

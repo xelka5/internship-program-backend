@@ -5,53 +5,37 @@ import com.tusofia.internshipprogram.dto.application.ApplicationDetailsDto;
 import com.tusofia.internshipprogram.dto.application.ApplicationResponseDto;
 import com.tusofia.internshipprogram.dto.application.InternshipApplicationDto;
 import com.tusofia.internshipprogram.dto.application.PendingApplicationDto;
-import com.tusofia.internshipprogram.service.ApplicationService;
-import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.Valid;
 import java.util.List;
 
-import static com.tusofia.internshipprogram.config.OAuth2AuthServerConfig.USER_EMAIL_LABEL;
+/**
+ * Api description of internship application operations controller.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
+@Api(tags={"Internship application Endpoints"},  description = "Internship application operations")
+public interface ApplicationController {
 
-@RestController
-@RequestMapping("/api/applications")
-public class ApplicationController {
+  @ApiOperation(value = "Get All Intern Applications",
+          notes = "Retrieves all internship applications for currently logged intern")
+  List<ApplicationDetailsDto> getAllInternApplications(@ApiIgnore Authentication authentication);
 
-  private ApplicationService applicationService;
+  @ApiOperation(value = "Get All Pending Applications",
+          notes = "Retrieves all internship applications for currently logged intern")
+  List<PendingApplicationDto> getAllPendingApplications(@ApiIgnore Authentication authentication);
 
-  @Autowired
-  public ApplicationController(ApplicationService applicationService) {
-    this.applicationService = applicationService;
-  }
+  @ApiOperation(value = "Create New Internship Application",
+          notes = "Creates new pending internship application by an intern")
+  BaseResponseDto addNewApplication(InternshipApplicationDto internshipApplicationDto,
+                                    @ApiIgnore Authentication authentication);
 
-  @GetMapping
-  public List<ApplicationDetailsDto> getAllInternApplications(Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return applicationService.getAllInternApplications(userEmail);
-  }
-
-  @GetMapping("/employer/pending")
-  public List<PendingApplicationDto> getAllPendingApplications(Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return applicationService.getAllPendingApplications(userEmail);
-  }
-
-  @PostMapping
-  public BaseResponseDto addNewApplication(@Valid @RequestBody InternshipApplicationDto internshipApplicationDto, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return applicationService.addNewApplication(internshipApplicationDto, userEmail);
-  }
-
-  @PutMapping("/employer")
-  public BaseResponseDto updateApplicationResponse(@Valid @RequestBody ApplicationResponseDto applicationResponseDto, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return applicationService.updateApplicationResponse(applicationResponseDto, userEmail);
-  }
+  @ApiOperation(value = "Update Application Response",
+          notes = "Accepts/Rejects pending application from employer side")
+  BaseResponseDto updateApplicationResponse(ApplicationResponseDto applicationResponseDto,
+                                            @ApiIgnore Authentication authentication);
 }

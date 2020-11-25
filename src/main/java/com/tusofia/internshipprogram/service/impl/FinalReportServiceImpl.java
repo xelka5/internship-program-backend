@@ -4,31 +4,39 @@ import com.tusofia.internshipprogram.config.ApplicationConfig;
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.finalReport.CreateFinalReportRequestDto;
 import com.tusofia.internshipprogram.dto.finalReport.CreateFinalReportResponseDto;
-import com.tusofia.internshipprogram.dto.finalReport.FinalReportWithInternProfileDto;
 import com.tusofia.internshipprogram.dto.finalReport.FinalReportEmployerDto;
+import com.tusofia.internshipprogram.dto.finalReport.FinalReportWithInternProfileDto;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.finalReport.FinalReport;
 import com.tusofia.internshipprogram.entity.internship.Internship;
+import com.tusofia.internshipprogram.entity.user.InternDetails;
 import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.enumeration.FinalReportType;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
+import com.tusofia.internshipprogram.exception.FileNotUploadedException;
 import com.tusofia.internshipprogram.exception.InsufficientRightsException;
 import com.tusofia.internshipprogram.mapper.FinalReportMapper;
 import com.tusofia.internshipprogram.repository.ApplicationRepository;
 import com.tusofia.internshipprogram.repository.FinalReportRepository;
 import com.tusofia.internshipprogram.repository.InternshipRepository;
 import com.tusofia.internshipprogram.service.FinalReportService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.tusofia.internshipprogram.util.GlobalConstants.*;
+
 @Service
+@Slf4j
 public class FinalReportServiceImpl implements FinalReportService {
 
   private InternshipRepository internshipRepository;
@@ -50,10 +58,10 @@ public class FinalReportServiceImpl implements FinalReportService {
   public FinalReportEmployerDto getInternshipReportInfoEmployer(String internshipTrackingNumber, String userEmail) {
     Internship savedInternship = internshipRepository
             .findByTrackingNumber(internshipTrackingNumber)
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
-    if(!savedInternship.getEmployer().getUser().getEmail().equals(userEmail)) {
-      throw new InsufficientRightsException("User does not have rights to get final reports");
+    if (!savedInternship.getEmployer().getUser().getEmail().equals(userEmail)) {
+      throw new InsufficientRightsException(INSUFFICIENT_RIGHTS_FINAL_REPORT_MESSAGE);
     }
 
     List<InternshipApplication> acceptedInterns = savedInternship.getApplications()
@@ -70,19 +78,19 @@ public class FinalReportServiceImpl implements FinalReportService {
   public FinalReportWithInternProfileDto getFinalReportByInternshipAndUser(String internshipTrackingNumber, String userEmail) {
     Internship savedInternship = internshipRepository
             .findByTrackingNumber(internshipTrackingNumber)
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     InternshipApplication internshipApplication = savedInternship.getApplications()
             .stream()
             .filter(application -> application.getInternDetails().getUser().getEmail().equals(userEmail))
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Internship application for this user does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_APPLICATION_NOT_FOUND_MESSAGE));
 
     FinalReport finalReport = internshipApplication.getFinalReports()
             .stream()
             .filter(report -> report.getFinalReportType() == FinalReportType.INTERN)
             .findAny()
-            .orElseThrow(() -> new EntityNotFoundException("Intern report not found for this internship"));
+            .orElseThrow(() -> new EntityNotFoundException(REPORT_NOT_FOUND_FOR_INTERNSHIP_MESSAGE));
 
     return finalReportMapper.finalReportToFinalReportWithInternProfileDto(finalReport);
   }
@@ -90,7 +98,7 @@ public class FinalReportServiceImpl implements FinalReportService {
   @Override
   public CreateFinalReportResponseDto createFinalReportEmployer(CreateFinalReportRequestDto createFinalReportRequestDto, String userEmail) {
     InternshipApplication application = applicationRepository.findByTrackingNumber(createFinalReportRequestDto.getApplicationTrackingNumber())
-            .orElseThrow(() -> new EntityNotFoundException("Internship application does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_APPLICATION_NOT_FOUND_MESSAGE));
 
     FinalReport finalReport = finalReportMapper
             .createFinalReport(application, createFinalReportRequestDto, FinalReportType.EMPLOYER);
@@ -103,13 +111,13 @@ public class FinalReportServiceImpl implements FinalReportService {
   @Override
   public CreateFinalReportResponseDto createFinalReportIntern(CreateFinalReportRequestDto createFinalReportRequestDto, String userEmail) {
     Internship internship = internshipRepository.findByTrackingNumber(createFinalReportRequestDto.getInternshipTrackingNumber())
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     InternshipApplication internshipApplication = internship.getApplications()
             .stream()
             .filter(application -> application.getInternDetails().getUser().getEmail().equals(userEmail))
             .findAny()
-            .orElseThrow(() -> new InsufficientRightsException("User has no rights to make a final report"));
+            .orElseThrow(() -> new InsufficientRightsException(INSUFFICIENT_RIGHTS_FINAL_REPORT_MESSAGE));
 
     FinalReport finalReport = finalReportMapper
             .createFinalReport(internshipApplication, createFinalReportRequestDto, FinalReportType.INTERN);
@@ -122,17 +130,18 @@ public class FinalReportServiceImpl implements FinalReportService {
   @Override
   public BaseResponseDto uploadFinalReport(MultipartFile finalReportFile, String reportTrackingNumber) {
     FinalReport finalReport = finalReportRepository.findByTrackingNumber(reportTrackingNumber)
-            .orElseThrow(() -> new EntityNotFoundException("Final report does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(FINAL_REPORT_NOT_FOUND_MESSAGE));
 
     String originalFileName = finalReportFile.getOriginalFilename();
 
-    if(originalFileName == null) {
-      throw new RuntimeException("Could not store the file. Error: invalid file name");
+    if (originalFileName == null) {
+      throw new FileNotUploadedException(INVALID_FILE_NAME_MESSAGE);
     }
 
     try {
       String extension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
-      String uniqueFileName = String.format("%s.%s", UUID.randomUUID().toString(), extension);
+
+      String uniqueFileName = createFinalReportFileName(finalReport, extension);
 
       Path uploadImagesDirectory = Paths.get(applicationConfig.getFinalReportsDirectory());
 
@@ -142,9 +151,38 @@ public class FinalReportServiceImpl implements FinalReportService {
       finalReportRepository.save(finalReport);
 
     } catch (Exception e) {
-      throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+      String errorMessage = String.format(STORE_FILE_GENERAL_ERROR_MESSAGE, e.getMessage());
+
+      LOGGER.error(errorMessage);
+      throw new FileNotUploadedException(errorMessage);
     }
 
     return new BaseResponseDto(true);
+  }
+
+
+  private String createFinalReportFileName(FinalReport finalReport, String extension) {
+
+    if(FinalReportType.EMPLOYER == finalReport.getFinalReportType()) {
+      Internship internship = finalReport.getInternshipApplication().getInternship();
+
+      return String.join("_", internship.getEmployer().getCompanyName(), "final", "report", String.valueOf(Instant.now().toEpochMilli()))
+              .concat(".")
+              .concat(extension)
+              .replace(" ", "_")
+              .toLowerCase();
+
+    } else if(FinalReportType.INTERN == finalReport.getFinalReportType()) {
+      InternDetails internDetails = finalReport.getInternshipApplication().getInternDetails();
+
+      return String.join("_", internDetails.getFirstName(), internDetails.getLastName(), "final", "report", String.valueOf(Instant.now().toEpochMilli()))
+              .concat(".")
+              .concat(extension)
+              .replace(" ", "_")
+              .toLowerCase();
+
+    } else {
+      throw new RuntimeException();
+    }
   }
 }

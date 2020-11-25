@@ -1,0 +1,2275 @@
+{
+	"info": {
+		"_postman_id": "f4e817cb-a218-415f-b0e3-798edcf13632",
+		"name": "InternshipProgramSamples",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "UserEndpoints",
+			"item": [
+				{
+					"name": "EmployerRegistration",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account\": {\n        \"email\": \"emp@internships.com\",\n        \"password\": \"employer123\",\n        \"username\": \"ScaleFocus\"\n    },\n    \"role\": \"EMPLOYER\",\n    \"userDetails\": {\n        \"companyName\": \"ScaleFocus AD\",\n        \"numberOfWorkers\": 5,\n        \"historyNotes\": \"We have 7 years of excellency\",\n        \"descriptionNotes\": \"Software solutions for sustainable growth\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadProfileImageEmployer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": "/postman/internship-programs/assets/emp1-profile-photo.jpg"
+								},
+								{
+									"key": "email",
+									"value": "emp@internships.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration/upload",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d74abc4d-c4cc-4ee5-b2e4-bfa19382c669",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EmployerDetailsUpdate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{employer-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account\": {\n        \"email\": \"emp@internships.com\",\n        \"password\": \"employer123\",\n        \"username\": \"ScaleFocus\"\n    },\n    \"role\": \"EMPLOYER\",\n    \"userDetails\": {\n        \"companyName\": \"ScaleFocus AD\",\n        \"numberOfWorkers\": 5,\n        \"historyNotes\": \"We have 7 years of excellency. Updated\",\n        \"descriptionNotes\": \"Software solutions for sustainable growth\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmployerDetails",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{employer-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InternRegistration",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account\": {\n        \"email\": \"intern@internships.com\",\n        \"password\": \"intern123\",\n        \"username\": \"intern\"\n    },\n    \"role\": \"INTERN\",\n    \"userDetails\": {\n        \"age\": 22,\n        \"firstName\": \"Dusan\",\n        \"lastName\": \"Cvetkov\",\n        \"course\": \"KSI\",\n        \"previousEducation\": \"Serbia\",\n        \"startDate\": \"2016\",\n        \"university\": \"TU\",\n        \"skills\": [\n            \"Java\",\n            \"Spring\",\n            \"Angular\"\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadProfileImageIntern",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": "/postman/internship-programs/assets/intern1-profile-photo.jpg"
+								},
+								{
+									"key": "email",
+									"value": "intern@internships.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration/upload",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cf9f9b98-83af-4f15-9996-64711a5570de",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"intern-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "intern@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "intern123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InternDetailsUpdate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account\": {\n        \"email\": \"intern@internships.com\",\n        \"username\": \"Dusan Cvetkov\"\n    },\n    \"role\": \"INTERN\",\n    \"userDetails\": {\n        \"age\": 22,\n        \"firstName\": \"Dusan\",\n        \"lastName\": \"Cvetkov\",\n        \"course\": \"KSI\",\n        \"previousEducation\": \"Serbia\",\n        \"startDate\": \"2016\",\n        \"university\": \"TU\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetInternDetails",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserDetailsByEmail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users/email?userEmail=intern@internships.com",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"email"
+							],
+							"query": [
+								{
+									"key": "userEmail",
+									"value": "intern@internships.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CheckEmailExists",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"emailToCheck\": \"intern@internships.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration/email-check",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration",
+								"email-check"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "RetrieveToken",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2a2e933f-f089-4ed2-9bbf-75ea205fec3d",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ef3067e8-dcb6-47e8-859f-ade731070fff",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"intern-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "intern@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "intern123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RefreshToken",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "s3cret",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2VtYWlsIjoiYWRtaW5pbnRlcm5AaW50ZXJuc2hpcHMuY29tIiwidXNlcl9uYW1lIjoiYWRtaW4iLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiYXRpIjoiMWVmZTVkN2MtNWM0Mi00Yjc2LWJjMGEtMjI2M2ViYjY1Nzg0IiwiZXhwIjoxNTkwMDk4MDQzLCJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJqdGkiOiI2MTI0YTc4Yi1jY2I0LTRjNmUtYTc1Zi1jZTg0ZjA5ZDFhZTMiLCJjbGllbnRfaWQiOiJpbnRlcm5zaGlwIn0.Nphkp0HJ5_BHMJ7x7QH7Dn6U1EmYCrPBPMJdOrytMEo",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "InternshipEndpoints",
+			"item": [
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "96fe85e2-2d43-4f50-a7b5-be4992d74816",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"intern-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "intern@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "intern123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllInternships",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships?status=ACTIVE",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FilterInternships",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/search?searchTerm=Ang",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"search"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "Ang"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetActiveInternships",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/active",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3fc7af80-a6de-486a-9249-edccafb1d332",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllInternshipsForEmployer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{employer-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2VtYWlsIjoiZW1wQGludGVybnNoaXBzLmNvbSIsInVzZXJfbmFtZSI6ImVtcGxveWVyIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImV4cCI6MTU5MTU2OTAxMSwiYXV0aG9yaXRpZXMiOlsiRU1QTE9ZRVIiXSwianRpIjoiNWRjMjc0M2YtOTEyMS00YzI3LWEwNjEtNjJlNTc0NzE3YWM5IiwiY2xpZW50X2lkIjoiaW50ZXJuc2hpcCJ9.sP1sK7GnN-lZdEXiskgxBpEk9QnD_CBVDyUstuW7C7A",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3781b147-226c-49f0-b4e1-cfa5b9fbb477",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9132df2d-0eea-4503-b7b2-5331c5e5758e",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "ApplicationEndpoint",
+			"item": [
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b6ed059d-b287-4dd5-9158-c02e9e5bbd71",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"intern-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "intern@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "intern123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddNewApplication",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Golang developer internship\",\n\t\"description\": \"Will learn golang basics, collecitons and data types, grpc protocols and working with web environment. Microservice architecture will be used.\",\n\t\"maxNumberOfStudents\": 5,\n\t\"startDate\": \"2020-07-31T18:22:58.000Z\",\n\t\"duration\": 1,\n\t\"durationUnit\": \"MONTH\",\n\t\"type\": \"PAID\",\n\t\"salary\": 900,\n\t\"currency\": \"BGN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/internships",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllInternApplications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{intern-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/applications",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e231b442-0728-4be1-9d04-48f9729269d9",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetPendingApplications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{employer-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/applications/employer/pending",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications",
+								"employer",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GetAssignedInterns",
+			"item": [
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd52729f-8a3e-4cac-86cf-b9e159d7113a",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllInternshipsForEmployer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{employer-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer/assigned/ca82b796-9ddc-480e-8064-0126b5ba3447",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer",
+								"assigned",
+								"ca82b796-9ddc-480e-8064-0126b5ba3447"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "FinalReports",
+			"item": [
+				{
+					"name": "Employer",
+					"item": [
+						{
+							"name": "LoginEmployer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7bac6b02-f445-4e62-bbe8-53367043cf98",
+										"exec": [
+											"var jsonResponse = JSON.parse(responseBody);\r",
+											"\r",
+											"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "$3cr3Tf0rD3Vpurp0$e$",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "internship",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json, text/plain, */*",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "emp@internships.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "employer123",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										}
+									],
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{internship-host}}/oauth/token",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"oauth",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAllFinalReportsInternshipEmp",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{employer-token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{internship-host}}/api/final-reports/employer/ca82b796-9ddc-480e-8064-0126b5ba3447",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"api",
+										"final-reports",
+										"employer",
+										"ca82b796-9ddc-480e-8064-0126b5ba3447"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Intern",
+					"item": [
+						{
+							"name": "LoginIntern",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ff59b130-45fe-4b3a-a6c5-b25fd29d8fdd",
+										"exec": [
+											"var jsonResponse = JSON.parse(responseBody);\r",
+											"\r",
+											"postman.setEnvironmentVariable(\"intern-token\", jsonResponse.access_token)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "$3cr3Tf0rD3Vpurp0$e$",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "internship",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json, text/plain, */*",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "intern@internships.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "intern123",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										}
+									],
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{internship-host}}/oauth/token",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"oauth",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetInternFinalReport",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{intern-token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{internship-host}}/api/final-reports/internship/ca82b796-9ddc-480e-8064-0126b5ba3447",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"api",
+										"final-reports",
+										"internship",
+										"ca82b796-9ddc-480e-8064-0126b5ba3447"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9291c43c-5230-45a8-9c5d-98d112ae3bd2",
+								"exec": [
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"employer-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "emp@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "employer123",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetInternReportsByEmail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{employer-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/reports/internship/ca82b796-9ddc-480e-8064-0126b5ba3447/intern/intern@internships.com",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"internship",
+								"ca82b796-9ddc-480e-8064-0126b5ba3447",
+								"intern",
+								"intern@internships.com"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "PendingRegistration",
+					"item": [
+						{
+							"name": "LoginAdmin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "62814aed-22f8-4163-a11e-ebc88d7cfd60",
+										"exec": [
+											"var jsonResponse = JSON.parse(responseBody);\r",
+											"\r",
+											"postman.setEnvironmentVariable(\"admin-token\", jsonResponse.access_token)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "$3cr3Tf0rD3Vpurp0$e$",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "internship",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json, text/plain, */*",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "admin@internships.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "intern123",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										}
+									],
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{internship-host}}/oauth/token",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"oauth",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetPendingRegistration",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin-token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{internship-host}}/api/admin/pending",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"pending"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "FinishedInternships",
+					"item": [
+						{
+							"name": "LoginAdmin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d6493088-a72f-4eca-9769-90e780539cea",
+										"exec": [
+											"var jsonResponse = JSON.parse(responseBody);\r",
+											"\r",
+											"postman.setEnvironmentVariable(\"admin-token\", jsonResponse.access_token)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "$3cr3Tf0rD3Vpurp0$e$",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "internship",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json, text/plain, */*",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "admin@internships.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "employer123",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										}
+									],
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{internship-host}}/oauth/token",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"oauth",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetFinishedInternshipReports",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin-token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{internship-host}}/api/admin/report/ca82b796-9ddc-480e-8064-0126b5ba3447",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"report",
+										"ca82b796-9ddc-480e-8064-0126b5ba3447"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetFinishedInternships",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin-token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{internship-host}}/api/admin/finished",
+									"host": [
+										"{{internship-host}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"finished"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "ResetPassword",
+			"item": [
+				{
+					"name": "RequestResetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userEmail\": \"xelcina@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/reset-password/request",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"reset-password",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ConfirmResetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userEmail\": \"xelcina@gmail.com\",\r\n    \"resetCode\": \"3fcd68b\",\r\n    \"newPassword\": \"dushantest1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/reset-password/confirm",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"reset-password",
+								"confirm"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

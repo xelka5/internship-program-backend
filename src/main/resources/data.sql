@@ -1,0 +1,3 @@
+INSERT INTO `internship-program`.`user` (`create_date`, `modify_date`, `version`, `email`, `password`, `profile_image_name`, `role`, `user_allowed`, `user_status`, `username`)
+SELECT NOW(), NOW(), '0', 'admin@internships.com', '$2a$10$P8CSKtFiW3/3w9aGmOWwxuYWvSGLMNTSoi.Ppr6jSzG1Vy5FWDfO.', 'images/default_user.png', 'ADMIN', b'1', 'ACTIVE', 'admin'
+WHERE NOT EXISTS (SELECT * FROM `internship-program`.`user` WHERE `email`= 'admin@internships.com');

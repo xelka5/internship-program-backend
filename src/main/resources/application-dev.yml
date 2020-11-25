@@ -1,10 +1,14 @@
 # Spring Framework properties
 spring:
   datasource:
-    url : 'jdbc:mysql://localhost:3306/internship-program?allowPublicKeyRetrieval=true&useSSL=false'
+    url : 'jdbc:mysql://internship-program-db-dev:3306/internship-program?allowPublicKeyRetrieval=true&useSSL=false'
     username : '@dm1nUser11'
     password : 'us3rp@ssw0rD12'
 
 # Cross origin resource sharing properties
 cors:
-  allowedOrigin: 'http://localhost:4200'
+  allowedOrigin: 'http://localhost:4201'
+
+# External source resource properties
+resources:
+  environment-url: http://localhost:4201

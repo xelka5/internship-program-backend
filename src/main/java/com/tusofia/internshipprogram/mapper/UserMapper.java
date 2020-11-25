@@ -30,7 +30,7 @@ public interface UserMapper {
   @Mapping(target = "email", source = "account.email")
   @Mapping(target = "username", source = "account.username")
   @Mapping(target = "password", source = "account.password", qualifiedByName = "hashPassword")
-  @Mapping(target = "profileImageName", source = "account.profileImageName", defaultValue = "templates/default_user.png")
+  @Mapping(target = "profileImageName", source = "account.profileImageName", defaultValue = "images/default_user.png")
   User userDetailsDtoToUser(UserDetailsDto userDetailsDto);
 
   @Mapping(target = "username", source = "account.username")

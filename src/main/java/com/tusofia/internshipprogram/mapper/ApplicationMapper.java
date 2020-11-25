@@ -1,11 +1,11 @@
 package com.tusofia.internshipprogram.mapper;
 
 import com.tusofia.internshipprogram.dto.application.ApplicationDetailsDto;
+import com.tusofia.internshipprogram.dto.application.ApplicationInternshipDetailsDto;
+import com.tusofia.internshipprogram.dto.application.InternshipApplicationDto;
 import com.tusofia.internshipprogram.dto.application.PendingApplicationDto;
 import com.tusofia.internshipprogram.dto.internship.AssignedInternDto;
 import com.tusofia.internshipprogram.dto.user.EmployerProfileDto;
-import com.tusofia.internshipprogram.dto.application.ApplicationInternshipDetailsDto;
-import com.tusofia.internshipprogram.dto.application.InternshipApplicationDto;
 import com.tusofia.internshipprogram.dto.user.InternProfileDto;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
 import com.tusofia.internshipprogram.entity.internship.Internship;

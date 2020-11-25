@@ -7,6 +7,12 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.springframework.stereotype.Component;
 
+/**
+ * In memory cache used for short term verifications like registration or forgot password confirmation.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
 @Component
 public class CacheHelper {
 
@@ -14,18 +20,20 @@ public class CacheHelper {
   private static final String FORGOT_PASSWORD_CACHE = "forgotPassword";
 
   private CacheManager cacheManager;
-  private Cache<String, String> registerConfirmationCache;
-  private Cache<String, String> forgotPasswordCache;
 
+  /**
+   * Creating cache instance and registering two caches for
+   * registration confirmation and forgot password functionality
+   */
   public CacheHelper() {
     cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
     cacheManager.init();
 
-    registerConfirmationCache = cacheManager.createCache(REGISTER_CONFIRMATION_CACHE, CacheConfigurationBuilder
-        .newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10)));
+    cacheManager.createCache(REGISTER_CONFIRMATION_CACHE, CacheConfigurationBuilder
+            .newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10)));
 
-    forgotPasswordCache = cacheManager.createCache(FORGOT_PASSWORD_CACHE, CacheConfigurationBuilder
-        .newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10)));
+    cacheManager.createCache(FORGOT_PASSWORD_CACHE, CacheConfigurationBuilder
+            .newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10)));
   }
 
   public Cache<String, String> getRegisterConfirmationCache() {

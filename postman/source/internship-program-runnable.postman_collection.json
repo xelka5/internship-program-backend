@@ -1,0 +1,3328 @@
+{
+	"info": {
+		"_postman_id": "9c9c673c-a38b-49fa-b84e-ef25d7050888",
+		"name": "InternshipProgramRunnable",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Flow - RegisterEmployerAndCreateInternship",
+			"item": [
+				{
+					"name": "EmployerRegistration",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a0cd9937-73ea-4422-a918-1b551cf456be",
+								"exec": [
+									"let tempString = 'postman-' + Math.random().toString(36).substring(7);\r",
+									"\r",
+									"let email = tempString + '@postman.com';\r",
+									"\r",
+									"postman.setEnvironmentVariable('postman-emp1-username', tempString);\r",
+									"postman.setEnvironmentVariable('postman-emp1-email', email);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "874e7775-2576-4a7c-84bb-fe8fe744e188",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test employer is registerd successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.email).to.eql(expectedEmail);\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account\": {\n        \"email\": \"{{postman-emp1-email}}\",\n        \"password\": \"test1234\",\n        \"username\": \"{{postman-emp1-username}}\"\n    },\n    \"role\": \"EMPLOYER\",\n    \"userDetails\": {\n        \"companyName\": \"Company of {{postman-emp1-username}}\",\n        \"numberOfWorkers\": 100,\n        \"historyNotes\": \"Postman flow test\",\n        \"descriptionNotes\": \"Postman flow test\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadProfileImageEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d95b862-7e19-4ff3-83e2-825e3bf99d29",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test profile image is uploaded successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": "/postman/internship-programs/assets/emp1-profile-photo.jpg"
+								},
+								{
+									"key": "email",
+									"value": "{{postman-emp1-email}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration/upload",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployerNotActivated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7c44c73a-9673-4528-8325-e9a4feac2941",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employers email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employer is not activated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('PENDING_CONFIRMATION');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-emp1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-emp1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmployerDetailsAccessDeniedNotActivated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "04c1d707-09bc-44e9-8861-4eb3c983962b",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test error is access denied\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"access_denied\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ActivateEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a5204d8a-2405-4834-b81b-c7f095401f7c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userEmail\": \"{{postman-emp1-email}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/system/activate-user",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"activate-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployerActivated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7c2dc292-ad8a-4e69-a90d-b989b298eafb",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employers email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employer is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-emp1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-emp1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmployerDetailsAccessDeniedNotAllowed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5b54c322-1b8d-4448-847e-5a09bfe81650",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test error is access denied\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"access_denied\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e577f069-acf8-47ac-94a9-c4a46572315b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-admin-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "testadmin",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetPendingRegistrations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0408284f-f702-4677-b3e9-0dc98b016ac1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test user is pending registration\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var temporaryEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"    var foundUser = jsonData.find(user => user.account.email === temporaryEmail);\r",
+									"\r",
+									"    pm.expect(foundUser).not.eq(null);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-admin-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/admin/pending",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateEmployerStatus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "83736dcc-5589-495f-9946-69b8d6deb8b0",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test user status is updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-admin-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userAllowed\": true,\r\n    \"userEmail\": \"{{postman-emp1-email}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/admin/pending",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginEmployerActiveAndAllowed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8572c8fe-0cb6-4df6-8d8a-6610801a816a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employers email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employer is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-emp1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-emp1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmployerDetailsAfterUpdate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2217f1e9-50cf-485d-90b9-7f505bfbcb26",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test user role is employer\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.role).to.eql('EMPLOYER');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddNewInternship",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5185c9b4-d718-4284-a0cc-2cd33812aa0e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test internship is added\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e38f0750-23f9-48f7-a8e3-df9f7a07d3c8",
+								"exec": [
+									"let startDate = new Date().toISOString();\r",
+									"\r",
+									"postman.setEnvironmentVariable('postman-internship1-start-date', startDate);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Postman internship\",\n\t\"description\": \"Internship used in postman tests\",\n\t\"maxNumberOfStudents\": 10,\n\t\"startDate\": \"{{postman-internship1-start-date}}\",\n\t\"duration\": 1,\n\t\"durationUnit\": \"MONTH\",\n\t\"type\": \"PAID\",\n\t\"salary\": 900,\n\t\"currency\": \"BGN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/internships",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllInternshipsForEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b655a15d-7e1b-461a-bbe5-109b5b4d5767",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"One active internship is present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(1);\r",
+									"    pm.expect(jsonData[0].status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No students are assigned to the new internship\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData[0].numberOfAssignedStudents).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test internship tracking number is present and save for further usage\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData[0].trackingNumber).to.be.not.null;\r",
+									"\r",
+									"    postman.setEnvironmentVariable(\"postman-emp1-internship\", jsonData[0].trackingNumber)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer?status=ACTIVE",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2d818afe-65fd-40fc-87ad-a0066210505a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8b7e5830-4746-4fad-bd8e-f6c71c7f46ea",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Flow - RegisterInternAndSendApplication",
+			"item": [
+				{
+					"name": "InternRegistration",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e1a80d3a-efa2-4d5b-ac2d-116153179bd3",
+								"exec": [
+									"let tempString = 'postman-' + Math.random().toString(36).substring(7);\r",
+									"\r",
+									"let email = tempString + '@postman.com';\r",
+									"\r",
+									"postman.setEnvironmentVariable('postman-intern1-username', tempString);\r",
+									"postman.setEnvironmentVariable('postman-intern1-email', email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account\": {\n        \"email\": \"{{postman-intern1-email}}\",\n        \"password\": \"test1234\",\n        \"username\": \"{{postman-intern1-username}}\"\n    },\n    \"role\": \"INTERN\",\n    \"userDetails\": {\n        \"age\": 33,\n        \"firstName\": \"Intern\",\n        \"lastName\": \"Postman\",\n        \"course\": \"Postman course\",\n        \"previousEducation\": \"Postman test\",\n        \"startDate\": \"2020\",\n        \"university\": \"Postman\",\n        \"skills\": [\n            \"Postman 1\",\n            \"Postman 2\",\n            \"Postman 3\"\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadProfileImageIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4467846e-6c84-4c23-bfcc-d30ddf81cea0",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test profile image is uploaded successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": "/postman/internship-programs/assets/intern1-profile-photo.jpg"
+								},
+								{
+									"key": "email",
+									"value": "{{postman-intern1-email}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/users/registration/upload",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"registration",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "963803f6-a648-4586-9956-c25f4ba5b1f2",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged intern is not activated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('PENDING_CONFIRMATION');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-intern1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-intern1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetInternDetailsNotAllowed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4d1aa5d1-19ee-475b-b199-32c872387930",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test error is access denied\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"access_denied\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ActivateIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "89b47c17-adb8-4242-9212-f901b8ff0bbc",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userEmail\": \"{{postman-intern1-email}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/system/activate-user",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"activate-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginInternActivated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cd580897-6072-47b5-9f51-6ff6557c95a4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged intern is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-intern1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-intern1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetInternDetails",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5eaf3dba-e232-44f5-8115-4db2f9594f48",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test user role is intern\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.role).to.eql('INTERN');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.account.email).to.eql(expectedEmail);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/users",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllActiveInternships",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3c0470ca-8b3f-419d-a10d-e7c5e04ad3e4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test employers internship is active and present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedInternship = postman.getEnvironmentVariable('postman-emp1-internship');\r",
+									"\r",
+									"    pm.expect(JSON.stringify(jsonData)).contains(expectedInternship);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships?status=ACTIVE",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SendInternshipApplication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a5aa0e2a-12fb-4b49-abae-7b239fd1b2c1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test application is sent successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"details\": \"Postman test internship application\",\r\n    \"status\": \"PENDING\",\r\n    \"internship\": {\r\n        \"trackingNumber\": \"{{postman-emp1-internship}}\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/applications",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetInternsApplications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "043ba58a-76d6-4186-8879-05cac9cf67e7",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one pending application is present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(1);\r",
+									"    pm.expect(jsonData[0].status).to.eql('PENDING');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/applications",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SendInternshipApplicationAlreadyApplied",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "41cee0c2-031c-48a4-9f6a-9650c5fa45af",
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {\r",
+									"    pm.response.to.have.status(409);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test status is conflict\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.status).to.eql('CONFLICT');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"details\": \"Postman test internship application\",\r\n    \"status\": \"PENDING\",\r\n    \"internship\": {\r\n        \"trackingNumber\": \"{{postman-emp1-internship}}\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/applications",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Flow - AcceptInternAndCreateInternshipReport",
+			"item": [
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c72f17e8-c934-496f-a884-851471bae36f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employers email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employer is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-emp1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-emp1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllAssignedInternsForInternship",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "decbcd94-7d2c-4939-8d50-7febc8758ccd",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test internship has zero assigned interns\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(0);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer/assigned/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer",
+								"assigned",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllPendingApplications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "829e6050-dd8d-40f9-994f-b26c860296e7",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one pending application is present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    \r",
+									"    var expectedInternEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData[0].intern.email).to.eql(expectedInternEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test tracking number is present and save for future use\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(jsonData[0].trackingNumber).to.be.not.null;\r",
+									"\r",
+									"    postman.setEnvironmentVariable(\"postman-intern1-application\", jsonData[0].trackingNumber)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/applications/employer/pending",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications",
+								"employer",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AcceptPendingIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "406eff33-e09f-4537-aa40-19764930b54b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test intern is accepted successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"trackingNumber\": \"{{postman-intern1-application}}\",\r\n    \"status\": \"ACCEPTED\",\r\n    \"responseNotes\": \"Postman test accept intern\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/applications/employer",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"applications",
+								"employer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllAsignedInternsAfterAccepting",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c764793b-2105-4b14-a042-2a39634d2ba5",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one intern is assigned\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    \r",
+									"    var expectedInternEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData[0].email).to.eql(expectedInternEmail);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer/assigned/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer",
+								"assigned",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "67d75858-475b-40ba-bb1c-f8988aeb6373",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged intern is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-intern1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-intern1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetActiveInternships",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11593893-f962-4591-9210-6b15e5af1d1c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one internship is active\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test internship tracking number is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var internshipTrackingNumber = postman.getEnvironmentVariable('postman-emp1-internship');\r",
+									"\r",
+									"    pm.expect(jsonData[0].trackingNumber).to.eql(internshipTrackingNumber);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/assigned?status=ACTIVE",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"assigned"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReportsBeforeCreatingNew",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1dd7f4c6-cd0f-489b-bd51-3bdfd35b971c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test zero reports are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(0);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/reports/internship/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"internship",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateNewReport",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5a1e22f0-8449-4261-99f8-a710f43856d0",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test report is created successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reportStartDate\": \"2020-11-15T22:47:38.000Z\",\r\n    \"reportEndDate\": \"2020-11-22T22:47:38.000Z\",\r\n    \"reportDetails\": \"Postman test report\",\r\n    \"internshipTrackingNumber\": \"{{postman-emp1-internship}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/reports",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReportsAfterCreatingNew",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fcdeaa47-5fc5-4e64-9d02-8311b47c09a4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one report is created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.length).to.eql(1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/reports/internship/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"internship",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Flow - FinishInternshipAndCreateFinalReports",
+			"item": [
+				{
+					"name": "LoginEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "68902d11-89b2-4616-a319-67bab6468811",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employers email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-emp1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged employer is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-emp1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-emp1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FinishInternship",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f89bdf6f-09eb-4050-ab78-5d0e910f9d7d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test internship is finished successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"trackingNumber\": \"{{postman-emp1-internship}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer/finish",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer",
+								"finish"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetFinishedInternshipsForEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3135a8dc-9d7a-41ec-9cbd-fea86bdbb619",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test employers internship is finished\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData[0].status).contains('FINISHED');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test finished internship is with correct tracking number\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedInternship = postman.getEnvironmentVariable('postman-emp1-internship');\r",
+									"\r",
+									"    pm.expect(jsonData[0].trackingNumber).contains(expectedInternship);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test employers internship has one assigned intern\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData[0].numberOfAssignedStudents).is.eql(1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/internships/employer?status=FINISHED",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"internships",
+								"employer"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "FINISHED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateFinalReportEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "94f4272d-f034-4bf3-b3c7-082c9b3c9208",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report is created successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test tracking number is present and save for future use\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.reportTrackingNumber).not.to.be.null;\r",
+									"    \r",
+									"    postman.setEnvironmentVariable(\"postman-emp1-final-report\", jsonData.reportTrackingNumber)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reportNotes\": \"Postman test employer final report\",\r\n    \"applicationTrackingNumber\": \"{{postman-intern1-application}}\",\r\n    \"internshipTrackingNumber\": \"{{postman-emp1-internship}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/final-reports/employer",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"final-reports",
+								"employer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadFinalReportFileEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b899fddc-c4cf-453f-9d7e-789c2d84bead",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report file is uploaded successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "finalReportFile",
+									"type": "file",
+									"src": "/postman/internship-programs/assets/employer-report-template.doc"
+								},
+								{
+									"key": "reportTrackingNumber",
+									"value": "{{postman-emp1-final-report}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/final-reports/upload",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"final-reports",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetFinalReportEmployer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "39dfcc72-8b5d-410a-85f8-8581d482476a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one final report is present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.finalReports.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report is the correct one\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedApplication = postman.getEnvironmentVariable('postman-intern1-application');\r",
+									"    var expectedInternEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    var finalReport = jsonData.finalReports[0];\r",
+									"\r",
+									"    pm.expect(finalReport.applicationTrackingNumber).to.eql(expectedApplication);\r",
+									"    pm.expect(finalReport.finalReportType).to.eql('EMPLOYER');\r",
+									"    pm.expect(finalReport.reportPresent).to.eql(true);\r",
+									"    pm.expect(finalReport.internProfile.email).to.eql(expectedInternEmail);\r",
+									"    pm.expect(finalReport.reportFileLocation).not.to.be.null;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-emp1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reportNotes\": \"Postman test employer final report\",\r\n    \"applicationTrackingNumber\": \"{{postman-intern1-application}}\",\r\n    \"internshipTrackingNumber\": \"{{postman-emp1-internship}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/final-reports/employer/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"final-reports",
+								"employer",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ea9a76a4-deb8-4c43-92c8-ab354c399d91",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test access and refresh tokens are present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property('access_token');\r",
+									"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged interns email is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    pm.expect(jsonData.user_email).to.eql(expectedEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test logged intern is activate\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.user_status).to.eql('ACTIVE');\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-intern1-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{postman-intern1-email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateFinalReportIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b269a5f9-ca21-4e97-adc1-152f6db56144",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report is created successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test tracking number is present and save for future use\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.reportTrackingNumber).not.to.be.null;\r",
+									"    \r",
+									"    postman.setEnvironmentVariable(\"postman-intern1-final-report\", jsonData.reportTrackingNumber)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reportNotes\": \"Postman test intern final report\",\r\n    \"applicationTrackingNumber\": \"{{postman-intern1-application}}\",\r\n    \"internshipTrackingNumber\": \"{{postman-emp1-internship}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/final-reports/intern",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"final-reports",
+								"intern"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadFinalReportFileIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52a8eeef-35ab-4433-b564-dad50b2f30e6",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report file is uploaded successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "finalReportFile",
+									"type": "file",
+									"src": "/postman/internship-programs/assets/intern-report-template.doc"
+								},
+								{
+									"key": "reportTrackingNumber",
+									"value": "{{postman-intern1-final-report}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/api/final-reports/upload",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"final-reports",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetFinalReportIntern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c516e2ae-d825-4fb6-80e1-0939d1a2634e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report is the correct one\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedTrackingNumber = postman.getEnvironmentVariable('postman-intern1-final-report');\r",
+									"\r",
+									"    pm.expect(jsonData.trackingNumber).to.eql(expectedTrackingNumber);\r",
+									"    pm.expect(jsonData.finalReportType).to.eql('INTERN');\r",
+									"    pm.expect(jsonData.reportFileLocation).not.to.be.null;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-intern1-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/final-reports/internship/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"final-reports",
+								"internship",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "498a1e37-2477-4340-bce0-e6f896cd3fa3",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonResponse = JSON.parse(responseBody);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"postman-admin-token\", jsonResponse.access_token)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "$3cr3Tf0rD3Vpurp0$e$",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "internship",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin@internships.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "testadmin",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{internship-host}}/oauth/token",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AdminGetFinalReports",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "16b74912-ae32-40ea-8c24-47412209129e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test one final report is present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.finalReports.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report contains correct intern and application\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedApplication = postman.getEnvironmentVariable('postman-intern1-application');\r",
+									"    var expectedInternEmail = postman.getEnvironmentVariable('postman-intern1-email');\r",
+									"\r",
+									"    var finalReport = jsonData.finalReports[0];\r",
+									"\r",
+									"    pm.expect(finalReport.applicationTrackingNumber).to.eql(expectedApplication);\r",
+									"    pm.expect(finalReport.internProfile.email).to.eql(expectedInternEmail);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report contains correct employer report\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedTrackingNumber = postman.getEnvironmentVariable('postman-emp1-final-report');\r",
+									"\r",
+									"    var finalReportEmployer = jsonData.finalReports[0].finalReportEmployer;\r",
+									"\r",
+									"    pm.expect(finalReportEmployer.reportFileLocation).not.to.be.null;\r",
+									"    pm.expect(finalReportEmployer.finalReportType).to.eql('EMPLOYER');\r",
+									"    pm.expect(finalReportEmployer.trackingNumber).to.eql(expectedTrackingNumber);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Test final report contains correct intern report\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    var expectedTrackingNumber = postman.getEnvironmentVariable('postman-intern1-final-report');\r",
+									"\r",
+									"    var finalReportIntern = jsonData.finalReports[0].finalReportIntern;\r",
+									"\r",
+									"    pm.expect(finalReportIntern.reportFileLocation).not.to.be.null;\r",
+									"    pm.expect(finalReportIntern.finalReportType).to.eql('INTERN');\r",
+									"    pm.expect(finalReportIntern.trackingNumber).to.eql(expectedTrackingNumber);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{postman-admin-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{internship-host}}/api/admin/report/{{postman-emp1-internship}}",
+							"host": [
+								"{{internship-host}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"report",
+								"{{postman-emp1-internship}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

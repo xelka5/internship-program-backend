@@ -2,65 +2,54 @@ package com.tusofia.internshipprogram.controller;
 
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.report.InternReportDto;
-import com.tusofia.internshipprogram.service.ReportService;
-import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
-import static com.tusofia.internshipprogram.config.OAuth2AuthServerConfig.USER_EMAIL_LABEL;
+/**
+ * Api description of intern report operations controller.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
+@Api(tags={"Report Endpoints"},  description = "Report operations")
+public interface ReportController {
 
-@RestController
-@RequestMapping("/api/reports")
-public class ReportController {
+  @ApiOperation(value = "Get Intern Report",
+          notes = "Retrieves single intern report by given report tracking number")
+  InternReportDto getInternReport(
+          @ApiParam(value = "Report tracking number", required = true) String reportTrackingNumber,
+          @ApiIgnore Authentication authentication);
 
-  private ReportService reportService;
+  @ApiOperation(value = "Get Intern Reports For Internship",
+          notes = "Retrieves all intern reports for a single internship")
+  List<InternReportDto> getInternReportsForInternship(
+          @ApiParam(value = "Internship tracking number", required = true) String internshipTrackingNumber,
+          @ApiIgnore Authentication authentication);
 
-  public ReportController(ReportService reportService) {
-    this.reportService = reportService;
-  }
+  @ApiOperation(value = "Get Reports By Intern Email",
+          notes = "Retrieves all reports from single internship by single user by given user email")
+  List<InternReportDto> getReportsByInternEmail(
+          @ApiParam(value = "Internship tracking number", required = true) String internshipTrackingNumber,
+          @ApiParam(value = "Intern email", required = true) String internEmail);
 
-  @GetMapping("{reportTrackingNumber}")
-  public InternReportDto getInternReport(@PathVariable String reportTrackingNumber, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
+  @ApiOperation(value = "Create Report",
+          notes = "Creates new report by the intern")
+  BaseResponseDto createReport(InternReportDto internReport,
+                               @ApiIgnore Authentication authentication);
 
-    return reportService.getInternReport(reportTrackingNumber, userEmail);
-  }
+  @ApiOperation(value = "Edit Report",
+          notes = "Edits intern report by the given report tracking number")
+  BaseResponseDto editReport(InternReportDto internReport,
+                             @ApiParam(value = "Report tracking number", required = true) String reportTrackingNumber,
+                             @ApiIgnore Authentication authentication);
 
-  @GetMapping("internship/{internshipTrackingNumber}")
-  public List<InternReportDto> getInternReportsForInternship(@PathVariable String internshipTrackingNumber, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return reportService.getInternReportsByInternEmail(internshipTrackingNumber, userEmail);
-  }
-
-  @GetMapping("internship/{internshipTrackingNumber}/intern/{internEmail}")
-  public List<InternReportDto> getReportsByInternEmail(@PathVariable String internshipTrackingNumber,
-                                                       @PathVariable String internEmail) {
-
-    return reportService.getInternReportsByInternEmail(internshipTrackingNumber, internEmail);
-  }
-
-  @PostMapping
-  public BaseResponseDto createReport(@RequestBody InternReportDto internReport, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return reportService.createReport(internReport, userEmail);
-  }
-
-  @PutMapping("/{reportTrackingNumber}")
-  public BaseResponseDto editReport(@RequestBody InternReportDto internReport, @PathVariable String reportTrackingNumber, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return reportService.editReport(internReport, userEmail, reportTrackingNumber);
-  }
-
-  @DeleteMapping("/{reportTrackingNumber}")
-  public BaseResponseDto removeReport(@PathVariable String reportTrackingNumber, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return reportService.deleteReport(reportTrackingNumber, userEmail);
-  }
-
+  @ApiOperation(value = "Remove Report",
+          notes = "Removes intern report by the given report tracking number")
+  BaseResponseDto removeReport(@ApiParam(value = "Report tracking number", required = true) String reportTrackingNumber,
+                               @ApiIgnore Authentication authentication);
 }

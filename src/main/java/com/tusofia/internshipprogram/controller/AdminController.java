@@ -5,42 +5,35 @@ import com.tusofia.internshipprogram.dto.admin.UpdatePendingApprovalDto;
 import com.tusofia.internshipprogram.dto.finalReport.FinalReportAdminDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
 import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
-import com.tusofia.internshipprogram.service.AdminService;
-import com.tusofia.internshipprogram.service.impl.EmailServiceImpl;
-import org.springframework.web.bind.annotation.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
-import javax.validation.Valid;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/admin")
-public class AdminController {
+/**
+ * Api description of admin operations controller.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
+@Api(tags={"Admin Endpoints"},  description = "Admin users operations")
+public interface AdminController {
 
-  private AdminService adminService;
-  private EmailServiceImpl emailService;
+  @ApiOperation(value = "Get Finished Internships",
+                notes = "Retrieves finished internships for all users")
+  List<InternshipExtendedDto> getFinishedInternships();
 
-  public AdminController(AdminService adminService, EmailServiceImpl emailService) {
-    this.adminService = adminService;
-    this.emailService = emailService;
-  }
+  @ApiOperation(value = "Get Final Internship Reports",
+                notes = "Retrieves all final reports for internship by given internship tracking number")
+  FinalReportAdminDto getFinalInternshipReports(
+          @ApiParam(value = "Internship tracking number", required = true) String internshipTrackingNumber);
 
-  @GetMapping("/pending")
-  public List<UserDetailsDto> getPendingRegistrationUsers() {
-    return adminService.getPendingRegistrationUsers();
-  }
+  @ApiOperation(value = "Get Pending Registration Users",
+          notes = "Retrieves all employers who are pending registration approval")
+  List<UserDetailsDto> getPendingRegistrationUsers();
 
-  @GetMapping("/finished")
-  public List<InternshipExtendedDto> getFinishedInternships() {
-    return adminService.getFinishedInternships();
-  }
-
-  @GetMapping("/report/{internshipTrackingNumber}")
-  public FinalReportAdminDto getFinalInternshipReports(@PathVariable String internshipTrackingNumber) {
-    return adminService.getFinalInternshipReports(internshipTrackingNumber);
-  }
-
-  @PutMapping("/pending")
-  public BaseResponseDto updatePendingApproval(@Valid @RequestBody UpdatePendingApprovalDto updatePendingApprovalDto) {
-    return adminService.updatePendingApproval(updatePendingApprovalDto);
-  }
+  @ApiOperation(value = "Update Pending Approval",
+          notes = "Approves or rejects employer who is waiting approval")
+  BaseResponseDto updatePendingApproval(UpdatePendingApprovalDto updatePendingApprovalDto);
 }

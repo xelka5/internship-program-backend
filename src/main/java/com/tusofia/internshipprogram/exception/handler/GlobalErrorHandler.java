@@ -22,35 +22,37 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler({ EntityNotFoundException.class })
+  private static final String FIELD_VALIDATION_FAILED_MESSAGE = "Field validation failed";
+
+  @ExceptionHandler({EntityNotFoundException.class})
   public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
     ErrorDto errorDto = new ErrorDto(HttpStatus.NOT_FOUND, ex.getLocalizedMessage(), null);
 
     return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
   }
 
-  @ExceptionHandler({ AlreadyAppliedException.class })
+  @ExceptionHandler({AlreadyAppliedException.class})
   public ResponseEntity<Object> handleAlreadyAppliedException(AlreadyAppliedException ex) {
     ErrorDto errorDto = new ErrorDto(HttpStatus.CONFLICT, ex.getLocalizedMessage(), null);
 
     return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
   }
 
-  @ExceptionHandler({ InsufficientRightsException.class })
+  @ExceptionHandler({InsufficientRightsException.class})
   public ResponseEntity<Object> handleInsufficientRightsException(InsufficientRightsException ex) {
     ErrorDto errorDto = new ErrorDto(HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), null);
 
     return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
   }
 
-  @ExceptionHandler({ InternshipFullException.class })
+  @ExceptionHandler({InternshipFullException.class})
   public ResponseEntity<Object> handleInternshipFullException(InternshipFullException ex) {
     ErrorDto errorDto = new ErrorDto(HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), null);
 
     return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
   }
 
-  @ExceptionHandler({ Exception.class })
+  @ExceptionHandler({Exception.class})
   public ResponseEntity<Object> handleException(Exception ex) {
     ErrorDto errorDto = new ErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), null);
 
@@ -58,8 +60,10 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
   }
 
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception, HttpHeaders headers,
-                                                                HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
+                                                                HttpHeaders headers,
+                                                                HttpStatus status,
+                                                                WebRequest request) {
 
     List<String> errors = new ArrayList<>();
 
@@ -69,7 +73,7 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
       errors.add(fieldName.concat(": ").concat(errorMessage));
     });
 
-    ErrorDto errorDto = new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY, "Field validation failed", errors);
+    ErrorDto errorDto = new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY, FIELD_VALIDATION_FAILED_MESSAGE, errors);
 
     return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
   }

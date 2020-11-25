@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  internship-program-postman-test:
+    build: .
+    image: internship-program-postman-tests
+    command:
+      newman run internship-program-runnable.postman_collection.json -e docker-dev.postman_environment 
+      -r html,cli --reporter-html-export reports/test-result.html
+    volumes:
+      - ./source:/postman/internship-programs
+    networks:
+      - internship-program_internship-program-dev-network
+
+networks:
+  internship-program_internship-program-dev-network:
+    external: true
+  

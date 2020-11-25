@@ -4,7 +4,6 @@ import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.admin.UpdatePendingApprovalDto;
 import com.tusofia.internshipprogram.dto.finalReport.FinalReportAdminDto;
 import com.tusofia.internshipprogram.dto.finalReport.InternDetailsWithFinalReportsDto;
-import com.tusofia.internshipprogram.dto.internship.InternshipDto;
 import com.tusofia.internshipprogram.dto.internship.InternshipExtendedDto;
 import com.tusofia.internshipprogram.dto.user.UserDetailsDto;
 import com.tusofia.internshipprogram.entity.application.InternshipApplication;
@@ -12,7 +11,6 @@ import com.tusofia.internshipprogram.entity.internship.Internship;
 import com.tusofia.internshipprogram.entity.user.User;
 import com.tusofia.internshipprogram.enumeration.ApplicationStatus;
 import com.tusofia.internshipprogram.enumeration.InternshipStatus;
-import com.tusofia.internshipprogram.enumeration.UserRole;
 import com.tusofia.internshipprogram.enumeration.UserStatus;
 import com.tusofia.internshipprogram.exception.EntityNotFoundException;
 import com.tusofia.internshipprogram.mapper.AdminMapper;
@@ -25,6 +23,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.tusofia.internshipprogram.util.GlobalConstants.INTERNSHIP_NOT_FOUND_MESSAGE;
+import static com.tusofia.internshipprogram.util.GlobalConstants.USER_NOT_FOUND_MESSAGE;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -64,9 +65,9 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public BaseResponseDto updatePendingApproval(UpdatePendingApprovalDto updatePendingApprovalDto) {
     User updatingUser = userRepository.findByEmail(updatePendingApprovalDto.getUserEmail())
-            .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE));
 
-    if(updatePendingApprovalDto.getUserAllowed()) {
+    if (updatePendingApprovalDto.getUserAllowed()) {
       updatingUser.setUserAllowed(Boolean.TRUE);
     } else {
       updatingUser.setUserStatus(UserStatus.BLOCKED);
@@ -80,7 +81,7 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public FinalReportAdminDto getFinalInternshipReports(String internshipTrackingNumber) {
     Internship internship = internshipRepository.findByTrackingNumber(internshipTrackingNumber)
-            .orElseThrow(() -> new EntityNotFoundException("Internship does not exist"));
+            .orElseThrow(() -> new EntityNotFoundException(INTERNSHIP_NOT_FOUND_MESSAGE));
 
     List<InternshipApplication> acceptedInterns = internship.getApplications()
             .stream()

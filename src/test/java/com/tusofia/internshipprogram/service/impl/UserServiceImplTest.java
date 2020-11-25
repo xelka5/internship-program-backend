@@ -9,6 +9,9 @@ import com.tusofia.internshipprogram.enumeration.UserRole;
 import com.tusofia.internshipprogram.enumeration.UserStatus;
 import com.tusofia.internshipprogram.mapper.UserMapper;
 import com.tusofia.internshipprogram.repository.UserRepository;
+import com.tusofia.internshipprogram.service.EmailService;
+import com.tusofia.internshipprogram.util.cache.CacheHelper;
+import org.ehcache.Cache;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +43,16 @@ public class UserServiceImplTest {
   private UserMapper userMapper;
 
   @Mock
+  private CacheHelper cacheHelper;
+
+  @Mock
+  private Cache<String, String> registerConfirmationCache;
+
+  @Mock
   private ApplicationConfig applicationConfig;
+
+  @Mock
+  private EmailService emailService;
 
   @InjectMocks
   private UserServiceImpl userService;
@@ -56,6 +68,7 @@ public class UserServiceImplTest {
     User newUser = createNewUser();
     when(userMapper.userDetailsDtoToUser(any(UserDetailsDto.class))).thenReturn(newUser);
     when(userRepository.save(any(User.class))).thenReturn(newUser);
+    when(cacheHelper.getRegisterConfirmationCache()).thenReturn(registerConfirmationCache);
 
     // WHEN
     UserDetailsResponseDto userDetailsResponseDto = userService.registerNewUser(new UserDetailsDto());
@@ -64,7 +77,6 @@ public class UserServiceImplTest {
     assertTrue(userDetailsResponseDto.isSuccess());
     assertEquals(TEST_EMAIL, userDetailsResponseDto.getEmail());
   }
-
 
   private User createNewUser() {
     return new User(TEST_USERNAME, passwordEncoder.encode(TEST_PASSWORD),

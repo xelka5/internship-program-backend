@@ -30,16 +30,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tusofia.internshipprogram.util.GlobalConstants.READ_SCOPE;
+import static com.tusofia.internshipprogram.util.GlobalConstants.WRITE_SCOPE;
+
+/**
+ * Basic authentication server configuration with oauth2 protocol.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
 @Configuration
 @EnableAuthorizationServer
 public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
-  private final PasswordEncoder passwordEncoder;
-  private final UserDetailsService userDetailsService;
-  private final AuthenticationManager authenticationManager;
-
   public static final String USER_EMAIL_LABEL = "user_email";
   public static final String USER_STATUS_LABEL = "user_status";
+  public static final String USER_ALLOWED_LABEL = "user_allowed";
 
   @Value("${oauthData.clientId}")
   private String clientId;
@@ -62,6 +68,10 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
   @Value("${cors.allowedOrigin}")
   private String allowedOrigin;
 
+  private final PasswordEncoder passwordEncoder;
+  private final UserDetailsService userDetailsService;
+  private final AuthenticationManager authenticationManager;
+
   @Autowired
   public OAuth2AuthServerConfig(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
     this.authenticationManager = authenticationManager;
@@ -77,7 +87,7 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
             .accessTokenValiditySeconds(accessTokenValiditySeconds)
             .refreshTokenValiditySeconds(refreshTokenValiditySeconds)
             .authorizedGrantTypes(authorizedGrantTypes)
-            .scopes("read", "write");
+            .scopes(READ_SCOPE, WRITE_SCOPE);
   }
 
   @Override
@@ -112,6 +122,7 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
         Map<String, Object> additionalInfo = new HashMap<>();
         additionalInfo.put(USER_EMAIL_LABEL, userPrincipal.getEmail());
         additionalInfo.put(USER_STATUS_LABEL, userPrincipal.getUserStatus());
+        additionalInfo.put(USER_ALLOWED_LABEL, userPrincipal.getUserAllowed());
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
       }
       return accessToken;
@@ -133,15 +144,22 @@ public class OAuth2AuthServerConfig extends AuthorizationServerConfigurerAdapter
   @Bean
   public FilterRegistrationBean corsFilter() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowCredentials(true);
-    config.addAllowedOrigin(allowedOrigin);
-    config.addAllowedHeader("*");
-    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    source.registerCorsConfiguration("/**", config);
-    FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-    bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-    return bean;
+    source.registerCorsConfiguration("/**", getCorsConfiguration());
+
+    FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean<>(new CorsFilter(source));
+    filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+
+    return filterRegistrationBean;
+  }
+
+  private CorsConfiguration getCorsConfiguration() {
+    CorsConfiguration corsConfig = new CorsConfiguration();
+    corsConfig.setAllowCredentials(true);
+    corsConfig.addAllowedOrigin(allowedOrigin);
+    corsConfig.addAllowedHeader("*");
+    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+    return corsConfig;
   }
 
 }

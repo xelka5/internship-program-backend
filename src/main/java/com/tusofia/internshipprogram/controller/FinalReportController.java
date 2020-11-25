@@ -3,68 +3,51 @@ package com.tusofia.internshipprogram.controller;
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.finalReport.CreateFinalReportRequestDto;
 import com.tusofia.internshipprogram.dto.finalReport.CreateFinalReportResponseDto;
-import com.tusofia.internshipprogram.dto.finalReport.FinalReportWithInternProfileDto;
 import com.tusofia.internshipprogram.dto.finalReport.FinalReportEmployerDto;
-import com.tusofia.internshipprogram.service.FinalReportService;
-import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tusofia.internshipprogram.dto.finalReport.FinalReportWithInternProfileDto;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.Valid;
+/**
+ * Api description of final report operations controller.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
+@Api(tags={"Final Report Endpoints"},  description = "Final report operations")
+public interface FinalReportController {
 
-import static com.tusofia.internshipprogram.config.OAuth2AuthServerConfig.USER_EMAIL_LABEL;
+  @ApiOperation(value = "Get Internship Report Info Employer",
+          notes = "Creates new pending internship application by an intern")
+  FinalReportEmployerDto getInternshipReportInfoEmployer(
+          String internshipTrackingNumber,
+          @ApiIgnore Authentication authentication);
 
-@RestController
-@RequestMapping("/api/final-reports")
-public class FinalReportController {
+  @ApiOperation(value = "Get Final Report By Internship And User",
+          notes = "Creates new pending internship application by an intern")
+  FinalReportWithInternProfileDto getFinalReportByInternshipAndUser(
+          @ApiParam(value = "Internship tracking number", required = true) String internshipTrackingNumber,
+          @ApiIgnore Authentication authentication);
 
-  private static final String FINAL_REPORT_FILE = "finalReportFile";
-  private static final String REPORT_TRACKING_NUMBER = "reportTrackingNumber";
+  @ApiOperation(value = "Create Final Report For Employer",
+          notes = "Creates final report of the finished internship from the employer perspective")
+  CreateFinalReportResponseDto createFinalReportEmployer(
+          CreateFinalReportRequestDto createFinalReportRequestDto,
+          @ApiIgnore Authentication authentication);
 
-  private FinalReportService finalReportService;
+  @ApiOperation(value = "Create Final Report For Intern",
+          notes = "Creates final report of the finished internship from the intern perspective")
+  CreateFinalReportResponseDto createFinalReportIntern(
+          CreateFinalReportRequestDto createFinalReportRequestDto,
+          @ApiIgnore Authentication authentication);
 
-  @Autowired
-  public FinalReportController(FinalReportService finalReportService) {
-    this.finalReportService = finalReportService;
-  }
-
-
-  @GetMapping("/employer/{internshipTrackingNumber}")
-  public FinalReportEmployerDto getInternshipReportInfoEmployer(
-          @PathVariable("internshipTrackingNumber") String internshipTrackingNumber, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return finalReportService.getInternshipReportInfoEmployer(internshipTrackingNumber, userEmail);
-  }
-
-  @GetMapping("internship/{internshipTrackingNumber}")
-  public FinalReportWithInternProfileDto getFinalReportByInternshipAndUser(
-          @PathVariable("internshipTrackingNumber") String internshipTrackingNumber, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return finalReportService.getFinalReportByInternshipAndUser(internshipTrackingNumber, userEmail);
-  }
-
-  @PostMapping("/employer")
-  public CreateFinalReportResponseDto createFinalReportEmployer(@Valid @RequestBody CreateFinalReportRequestDto createFinalReportRequestDto, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return finalReportService.createFinalReportEmployer(createFinalReportRequestDto, userEmail);
-  }
-
-  @PostMapping("/intern")
-  public CreateFinalReportResponseDto createFinalReportIntern(@Valid @RequestBody CreateFinalReportRequestDto createFinalReportRequestDto, Authentication authentication) {
-    String userEmail = AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL);
-
-    return finalReportService.createFinalReportIntern(createFinalReportRequestDto, userEmail);
-  }
-
-  @PostMapping("/upload")
-  public BaseResponseDto uploadFinalReport(@RequestParam(FINAL_REPORT_FILE) MultipartFile finalReportFile,
-                                           @RequestParam(REPORT_TRACKING_NUMBER) String reportTrackingNumber) {
-
-    return finalReportService.uploadFinalReport(finalReportFile, reportTrackingNumber);
-  }
+  @ApiOperation(value = "Upload final report",
+          notes = "Uploads final report file to the server and updates report in the database by tracking number")
+  BaseResponseDto uploadFinalReport(
+          @ApiParam(value = "Final report file", required = true) MultipartFile finalReportFile,
+          @ApiParam(value = "Report tracking number", required = true) String reportTrackingNumber);
 }

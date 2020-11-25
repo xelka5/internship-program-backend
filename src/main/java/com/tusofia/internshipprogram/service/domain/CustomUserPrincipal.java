@@ -14,11 +14,13 @@ public class CustomUserPrincipal extends User {
 
   private String email;
   private UserStatus userStatus;
+  private Boolean userAllowed;
 
   public CustomUserPrincipal(String username, String password, UserStatus userStatus,
-                             Collection<? extends GrantedAuthority> authorities, String email) {
+                             Collection<? extends GrantedAuthority> authorities, String email, Boolean userAllowed) {
     super(username, password, authorities);
     this.email = email;
     this.userStatus = userStatus;
+    this.userAllowed = userAllowed;
   }
 }

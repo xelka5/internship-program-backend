@@ -11,10 +11,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Basic spring security configuration with oauth2 protocol.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class Oauth2SecurityConfig extends WebSecurityConfigurerAdapter {
+public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   @Override

@@ -4,79 +4,62 @@ import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckRequestDto;
 import com.tusofia.internshipprogram.dto.emailCheck.EmailCheckResponseDto;
 import com.tusofia.internshipprogram.dto.user.*;
-import com.tusofia.internshipprogram.service.UserService;
-import com.tusofia.internshipprogram.util.authentication.AuthenticationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+/**
+ * Api description of user operations controller.
+ *
+ * @author DCvetkov
+ * @since 2020
+ */
+@Api(tags={"User Endpoints"},  description = "User operations")
+public interface UserController {
 
-import static com.tusofia.internshipprogram.config.OAuth2AuthServerConfig.USER_EMAIL_LABEL;
+  @ApiOperation(value = "Get User Details",
+          notes = "Retrieves information about the currently logged used")
+  UserDetailsDto getUserDetails(Authentication authentication);
 
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
+  @ApiOperation(value = "Get User Details By Email",
+          notes = "Retrieves information about the currently logged used by given email")
+  UserDetailsDto getUserDetailsByEmail(@ApiParam(value = "User email", required = true) String userEmail);
 
-  private static final String PROFILE_IMAGE = "profileImage";
-  private static final String EMAIL = "email";
-  private UserService userService;
+  @ApiOperation(value = "Request Reset Password",
+          notes = "User initiated password reset operation")
+  BaseResponseDto requestResetPassword(ForgotPasswordRequestDto forgotPasswordRequest);
 
-  @Autowired
-  public UserController(UserService userService) {
-    this.userService = userService;
-  }
+  @ApiOperation(value = "Confirm Reset Password",
+          notes = "Confirms user authorization for the new password and resets the user password")
+  BaseResponseDto confirmResetPassword(ResetPasswordRequestDto resetPasswordRequest);
 
-  @GetMapping
-  public UserDetailsDto getUserDetails(Authentication authentication) {
-    return userService.getUserDetails(AuthenticationUtils.extractClaimFromAuthDetails(authentication, USER_EMAIL_LABEL));
-  }
+  @ApiOperation(value = "Register New User",
+          notes = "Registers new user with role intern or employer")
+  UserDetailsResponseDto registerNewUser(UserDetailsDto registrationRequest);
 
-  @GetMapping("/email")
-  public UserDetailsDto getUserDetailsByEmail(@RequestParam("userEmail") String userEmail) {
-    return userService.getUserDetails(userEmail);
-  }
+  @ApiOperation(value = "Update User Details",
+          notes = "Updates user information")
+  UserDetailsResponseDto updateUserDetails(UserDetailsDto updateRequest);
 
-  @PostMapping("/reset-password/request")
-  public BaseResponseDto requestResetPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequest) {
-    return userService.requestResetPassword(forgotPasswordRequest);
-  }
+  @ApiOperation(value = "Check Email",
+          notes = "Checks if user with given email is already registered")
+  EmailCheckResponseDto checkEmail(EmailCheckRequestDto emailCheckRequest);
 
-  @PostMapping("/reset-password/confirm")
-  public BaseResponseDto confirmResetPassword(@Valid @RequestBody ResetPasswordRequestDto resetPasswordRequest) {
-    return userService.confirmResetPassword(resetPasswordRequest);
-  }
+  @ApiOperation(value = "Confirm Registration",
+          notes = "Admin based confirm registration for employer")
+  BaseResponseDto confirmRegistration(RegistrationConfirmRequestDto registrationConfirmRequest);
 
-  @PostMapping("/registration")
-  public UserDetailsResponseDto registerNewUser(@Valid @RequestBody UserDetailsDto registrationRequest) {
-    return userService.registerNewUser(registrationRequest);
-  }
+  @ApiOperation(value = "Upload Profile Image",
+          notes = "Uploads profile image for user on the local disk and saves its name in the database")
+  UploadImageResponseDto uploadProfileImage(
+          @ApiParam(value = "Profile image", required = true) MultipartFile profileImage,
+          @ApiParam(value = "User email", required = true) String userEmail);
 
-  @PutMapping
-  public UserDetailsResponseDto updateUserDetails(@Valid @RequestBody UserDetailsDto updateRequest) {
-    return userService.updateUserDetails(updateRequest);
-  }
-
-  @PostMapping("/registration/email-check")
-  public EmailCheckResponseDto checkEmail(@Valid @RequestBody EmailCheckRequestDto emailCheckRequest) {
-    return userService.checkEmail(emailCheckRequest);
-  }
-
-  @PostMapping("/registration/confirm")
-  public BaseResponseDto confirmRegistration(@Valid @RequestBody RegistrationConfirmRequestDto registrationConfirmRequest) {
-    return userService.confirmRegistration(registrationConfirmRequest);
-  }
-
-  @PostMapping("registration/upload")
-  public UploadImageResponseDto uploadProfileImage(@RequestParam(PROFILE_IMAGE) MultipartFile profileImage,
-                                                   @RequestParam(EMAIL) String userEmail) {
-    return userService.uploadProfileImage(profileImage, userEmail);
-  }
-
-  @PostMapping("/upload")
-  public UploadImageResponseDto reuploadProfileImage(@RequestParam(PROFILE_IMAGE) MultipartFile profileImage,
-                                                     @RequestParam(EMAIL) String userEmail) {
-     return userService.uploadProfileImage(profileImage, userEmail);
-  }
+  @ApiOperation(value = "Reupload Profile Image",
+          notes = "Changes profile image for user, deletes the old one and saves the new one")
+  UploadImageResponseDto reuploadProfileImage(
+          @ApiParam(value = "Profile image", required = true) MultipartFile profileImage,
+          @ApiParam(value = "User email", required = true) String userEmail);
 }

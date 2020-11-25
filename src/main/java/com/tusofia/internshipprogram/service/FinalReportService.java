@@ -3,8 +3,8 @@ package com.tusofia.internshipprogram.service;
 import com.tusofia.internshipprogram.dto.BaseResponseDto;
 import com.tusofia.internshipprogram.dto.finalReport.CreateFinalReportRequestDto;
 import com.tusofia.internshipprogram.dto.finalReport.CreateFinalReportResponseDto;
-import com.tusofia.internshipprogram.dto.finalReport.FinalReportWithInternProfileDto;
 import com.tusofia.internshipprogram.dto.finalReport.FinalReportEmployerDto;
+import com.tusofia.internshipprogram.dto.finalReport.FinalReportWithInternProfileDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FinalReportService {
