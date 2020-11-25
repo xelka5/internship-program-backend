@@ -2,6 +2,7 @@ HELP.md
 target/
 profile-images/
 final-reports/
+postman/source/reports/
 
 !**/src/main/**
 !**/src/test/**
