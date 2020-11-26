@@ -26,9 +26,11 @@ public class EmployerDetails extends BaseEntity {
   private Integer numberOfWorkers;
 
   @NotEmpty
+  @Column(columnDefinition = "TEXT")
   private String historyNotes;
 
   @NotEmpty
+  @Column(columnDefinition = "TEXT")
   private String descriptionNotes;
 
 

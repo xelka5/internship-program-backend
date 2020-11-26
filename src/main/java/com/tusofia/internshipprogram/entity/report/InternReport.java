@@ -25,6 +25,7 @@ public class InternReport extends BaseEntity {
   private Date reportEndDate;
 
   @NotEmpty
+  @Column(columnDefinition = "TEXT")
   private String reportDetails;
 
   @NotEmpty

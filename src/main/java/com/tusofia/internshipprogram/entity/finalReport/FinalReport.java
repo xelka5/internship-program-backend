@@ -20,6 +20,7 @@ public class FinalReport extends BaseEntity {
 
   private String reportFileLocation;
 
+  @Column(columnDefinition = "TEXT")
   private String reportNotes;
 
   private String trackingNumber;
